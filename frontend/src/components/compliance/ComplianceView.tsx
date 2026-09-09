@@ -43,14 +43,14 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
-            Regulatory Compliance Audit
+            Regulatory Compliance
           </span>
           <h1 className="font-editorial text-4xl md:text-5xl font-bold text-ink tracking-tight">
-            Framework Alignment & Gaps
+            Compliance Readiness
           </h1>
           <p className="text-slate text-base mt-1 max-w-2xl">
-            Automated mapping of organizational security controls directly to Indian Reserve Bank (RBI CSF)
-            and International Organization for Standardization (ISO 27001:2022) audit clauses.
+            See how your organization's current security controls align with India's Reserve Bank Cyber Security
+            Framework (RBI CSF) and the international ISO 27001:2022 information security standard.
           </p>
         </div>
 
@@ -82,7 +82,8 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
       {loading || !data ? (
         <div className="py-24 text-center">
           <div className="w-10 h-10 border-4 border-sienna border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate text-xs font-medium">Auditing organizational controls against framework clauses...</p>
+          <p className="text-slate text-sm font-medium">Checking compliance requirements…</p>
+          <p className="text-slate/60 text-xs mt-1">Mapping security controls to framework clauses</p>
         </div>
       ) : (
         <>
@@ -120,7 +121,7 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
                 <Sparkles className="w-5 h-5 text-sienna shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-xs font-bold text-sienna uppercase tracking-wider mb-1">
-                    {data.ai_mode === 'ai_assisted' ? 'Groq Compliance Auditor Briefing' : 'Auditor Summary'}
+                    AI Compliance Summary
                   </h4>
                   <p className="text-xs text-sienna/90 leading-relaxed">{data.ai_narrative}</p>
                 </div>
@@ -130,7 +131,7 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
 
           {/* Filter Bar */}
           <div className="flex items-center justify-between">
-            <h3 className="font-editorial text-xl font-bold text-ink">Clause Audit Breakdown</h3>
+            <h3 className="font-editorial text-xl font-bold text-ink">Requirements Review</h3>
             <div className="flex items-center gap-1 bg-fog p-1 rounded-pill border border-mist text-xs">
               <button
                 onClick={() => setFilterStatus('all')}
@@ -198,18 +199,18 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
                           ) : (
                             <>
                               <AlertTriangle className="w-3 h-3" />
-                              <span>Non-Compliant</span>
+                              <span>Needs Attention</span>
                             </>
                           )}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-slate text-[11px]">
-                        {item.status === 'satisfied' ? (
-                          <span className="text-emerald">Auditor approved · defensible</span>
-                        ) : (
-                          <span className="text-crimson font-medium">Potential supervisory notice</span>
-                        )}
-                      </td>
+                       <td className="py-3 px-3 text-slate text-[11px]">
+                         {item.status === 'satisfied' ? (
+                           <span className="text-emerald">Requirement Met</span>
+                         ) : (
+                           <span className="text-crimson font-medium">Needs Attention — may require remediation</span>
+                         )}
+                       </td>
                     </tr>
                   ))}
                 </tbody>

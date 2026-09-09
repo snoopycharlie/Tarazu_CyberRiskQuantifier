@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, Building, Building2, ArrowRight, ShieldAlert, CheckCircle, Info, ChevronDown, ChevronUp } from 'lucide-react';
-import { DemoComparison, RuleTraceItem } from '../../types';
+import {
+  Building, Building2, ArrowRight, ShieldAlert, ChevronDown, ChevronUp, TrendingUp
+} from 'lucide-react';
+import { DemoComparison } from '../../types';
 import { api } from '../../services/api';
+import { formatInr } from '../../utils/format';
 
 export const Pillar1ComparisonView: React.FC = () => {
   const [data, setData] = useState<DemoComparison | null>(null);
@@ -18,44 +21,37 @@ export const Pillar1ComparisonView: React.FC = () => {
       const res = await api.getDemoComparison();
       setData(res);
     } catch (err) {
-      console.error('Failed to load demo comparison:', err);
+      console.error('Failed to load comparison:', err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatInr = (val: number) => {
-    if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
-    if (val >= 100000) return `₹${(val / 100000).toFixed(2)} L`;
-    return `₹${Math.round(val).toLocaleString('en-IN')}`;
   };
 
   if (loading || !data) {
     return (
       <div className="py-24 text-center">
         <div className="w-10 h-10 border-4 border-sienna border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate">Simulating organizational scaling engine across MSME and Enterprise tiers...</p>
+        <p className="text-slate font-medium">Comparing risk across organizations…</p>
+        <p className="text-slate/60 text-xs mt-1">Running business context analysis</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Editorial Header */}
+      {/* Page Header */}
       <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-peach text-sienna tracking-wide">
-            DEMO PILLAR #1
-          </span>
-          <span className="text-xs text-slate">Organizational Context Sensitivity</span>
-        </div>
+        <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
+          Why Context Matters
+        </span>
         <h1 className="font-editorial text-4xl md:text-5xl font-bold text-ink tracking-tight">
-          Identical Vulnerability · Divergent ₹ Risk
+          Risk Changes With Business Size
         </h1>
         <p className="text-slate text-base mt-2 max-w-3xl">
-          Traditional scanners label a CVSS 9.4 CVE as simply <span className="font-bold text-crimson">"Critical"</span> for everyone.
-          Tarazu replaces vague colors with mathematically sound Indian Rupee loss expectancies calibrated to revenue scale,
-          employee footprint, and regulatory exposure.
+          Traditional security scanners label the same vulnerability as{' '}
+          <span className="font-bold text-crimson">"Critical"</span> for everyone.
+          Tarazu goes further — it calculates the actual financial exposure based on your{' '}
+          <strong>organization's size, revenue, and regulatory context</strong>.
         </p>
       </div>
 
@@ -67,29 +63,32 @@ export const Pillar1ComparisonView: React.FC = () => {
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono text-sm font-bold text-crimson">CVE-2023-4966</span>
-                <span className="px-2 py-0.5 rounded-full bg-crimson text-paper text-xs font-bold">CVSS 9.4</span>
-                <span className="text-xs text-slate">Citrix Bleed · Unauthenticated Session Hijacking</span>
+                <span className="px-2 py-0.5 rounded-full bg-crimson text-paper text-xs font-bold">
+                  Severity 9.4 / 10
+                </span>
+                <span className="text-xs text-slate">Citrix Bleed — Unauthorized Session Hijacking</span>
               </div>
               <h3 className="font-bold text-ink text-base mt-1">Core Banking Database Cluster (Oracle 19c)</h3>
               <p className="text-xs text-slate mt-0.5">
-                Asset parameters: <strong>30% Revenue Dependency</strong>, Tagged <code>core_db</code>, Unpatched for <strong>75 Days</strong>.
+                Same vulnerability — <strong>30% revenue dependency</strong>, tagged as business-critical, unpatched for{' '}
+                <strong>75 days</strong>.
               </p>
             </div>
           </div>
           <div className="text-right whitespace-nowrap">
-            <span className="text-xs text-slate block uppercase tracking-wider">Identical CVE Across Both Orgs</span>
+            <span className="text-xs text-slate block uppercase tracking-wider">Same Vulnerability</span>
             <span className="text-xs font-semibold text-emerald bg-emerald/10 px-3 py-1 rounded-full inline-block mt-1">
-              Zero Parameter Discrepancy
+              Applied to Both Organizations
             </span>
           </div>
         </div>
       </div>
 
-      {/* Side-by-Side Comparison Cards */}
+      {/* Side-by-Side Comparison */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* MSME Card */}
+        {/* Small Business Card */}
         <div className="steep-card p-6 border-slate/30 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-mist">
@@ -100,18 +99,18 @@ export const Pillar1ComparisonView: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-ink text-base">{data.msme_org.name}</h3>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-mist text-slate">
-                    Tier: {data.msme_org.size_tier} · {data.msme_org.sector}
+                    Micro, Small & Medium Enterprise (MSME) · {data.msme_org.sector}
                   </span>
                 </div>
               </div>
               <span className="text-xs font-bold text-slate">Small Scale</span>
             </div>
 
-            {/* Profile Stats */}
+            {/* Organization Profile */}
             <div className="grid grid-cols-2 gap-3 py-4 border-b border-mist text-xs">
               <div>
                 <span className="text-slate block">Annual Revenue</span>
-                <span className="font-bold text-ink text-sm">₹15.0 Crore</span>
+                <span className="font-bold text-ink text-sm">₹15 Crore</span>
               </div>
               <div>
                 <span className="text-slate block">Employees</span>
@@ -119,22 +118,24 @@ export const Pillar1ComparisonView: React.FC = () => {
               </div>
             </div>
 
-            {/* Calculated EAL */}
+            {/* Calculated Exposure */}
             <div className="py-6">
-              <span className="text-xs uppercase font-bold tracking-wider text-slate">Expected Annual Loss (EAL)</span>
+              <span className="text-xs uppercase font-bold tracking-wider text-slate">
+                Estimated Annual Financial Exposure
+              </span>
               <div className="font-editorial text-4xl font-bold text-ink mt-1">
                 {formatInr(data.msme_eal_inr)}
               </div>
-              <p className="text-xs text-slate mt-2">
-                Single Loss Expectancy scaled to ₹15 Cr operational turnover. Manageable breach radius without systemic market contagion.
+              <p className="text-xs text-slate mt-2 leading-relaxed">
+                Exposure scaled to ₹15 Crore operational revenue. Contained breach impact without systemic financial contagion.
               </p>
             </div>
 
-            {/* Top Rules Fired */}
+            {/* Key Factors */}
             <div className="space-y-2 pt-2">
-              <span className="text-xs font-bold text-slate uppercase tracking-wider block">Key Triggered Rules:</span>
+              <span className="text-xs font-bold text-slate uppercase tracking-wider block">Key Risk Factors:</span>
               {data.msme_rule_trace.slice(0, 3).map((r, i) => (
-                <div key={i} className="text-xs p-2 rounded-xl bg-fog border border-mist flex justify-between">
+                <div key={i} className="text-xs p-2.5 rounded-xl bg-fog border border-mist flex justify-between">
                   <span className="text-ink truncate font-medium">{r.description}</span>
                   <span className="font-bold text-sienna shrink-0 ml-2">+{formatInr(r.contribution_inr)}</span>
                 </div>
@@ -143,7 +144,7 @@ export const Pillar1ComparisonView: React.FC = () => {
           </div>
         </div>
 
-        {/* Enterprise Card */}
+        {/* Large Enterprise Card */}
         <div className="steep-card-peach p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-sienna/20">
@@ -154,14 +155,14 @@ export const Pillar1ComparisonView: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-sienna text-base">{data.enterprise_org.name}</h3>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-sienna/15 text-sienna">
-                    Tier: {data.enterprise_org.size_tier} · {data.enterprise_org.sector}
+                    Enterprise · {data.enterprise_org.sector}
                   </span>
                 </div>
               </div>
-              <span className="text-xs font-bold text-sienna">Tier-1 Scale</span>
+              <span className="text-xs font-bold text-sienna">Large Scale</span>
             </div>
 
-            {/* Profile Stats */}
+            {/* Organization Profile */}
             <div className="grid grid-cols-2 gap-3 py-4 border-b border-sienna/20 text-xs text-sienna/90">
               <div>
                 <span className="text-sienna/70 block">Annual Revenue</span>
@@ -173,22 +174,24 @@ export const Pillar1ComparisonView: React.FC = () => {
               </div>
             </div>
 
-            {/* Calculated EAL */}
+            {/* Calculated Exposure */}
             <div className="py-6">
-              <span className="text-xs uppercase font-bold tracking-wider text-sienna/80">Expected Annual Loss (EAL)</span>
+              <span className="text-xs uppercase font-bold tracking-wider text-sienna/80">
+                Estimated Annual Financial Exposure
+              </span>
               <div className="font-editorial text-4xl font-bold text-sienna mt-1">
                 {formatInr(data.enterprise_eal_inr)}
               </div>
-              <p className="text-xs text-sienna/80 mt-2">
-                Single Loss Expectancy scaled to ₹5,000 Cr turnover, high customer breach disclosure liabilities, and RBI regulatory penalties.
+              <p className="text-xs text-sienna/80 mt-2 leading-relaxed">
+                Exposure scaled to ₹5,000 Crore revenue, with high customer breach disclosure liability and regulatory penalty exposure.
               </p>
             </div>
 
-            {/* Top Rules Fired */}
+            {/* Key Factors */}
             <div className="space-y-2 pt-2">
-              <span className="text-xs font-bold text-sienna uppercase tracking-wider block">Key Triggered Rules:</span>
+              <span className="text-xs font-bold text-sienna uppercase tracking-wider block">Key Risk Factors:</span>
               {data.enterprise_rule_trace.slice(0, 3).map((r, i) => (
-                <div key={i} className="text-xs p-2 rounded-xl bg-white/60 border border-sienna/20 flex justify-between text-sienna">
+                <div key={i} className="text-xs p-2.5 rounded-xl bg-white/60 border border-sienna/20 flex justify-between text-sienna">
                   <span className="truncate font-medium">{r.description}</span>
                   <span className="font-bold shrink-0 ml-2">+{formatInr(r.contribution_inr)}</span>
                 </div>
@@ -198,14 +201,16 @@ export const Pillar1ComparisonView: React.FC = () => {
         </div>
       </div>
 
-      {/* Scaling Ratio Callout Banner */}
+      {/* Scaling Ratio Callout */}
       <div className="p-6 rounded-3xl bg-fog border border-mist flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-peach text-sienna flex items-center justify-center font-editorial text-2xl font-bold shrink-0">
-            {data.scaling_factor}x
+            <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-ink text-base">Mathematical Scaling Ratio ({data.scaling_factor}x)</h3>
+            <h3 className="font-bold text-ink text-base">
+              {data.scaling_factor}× Difference — Same Vulnerability
+            </h3>
             <p className="text-xs text-slate mt-1 max-w-2xl leading-relaxed">{data.explanation}</p>
           </div>
         </div>
@@ -213,25 +218,28 @@ export const Pillar1ComparisonView: React.FC = () => {
           onClick={() => setShowTrace(!showTrace)}
           className="px-4 py-2.5 rounded-pill bg-ink text-paper text-xs font-semibold hover:bg-black transition flex items-center gap-2 whitespace-nowrap"
         >
-          <span>{showTrace ? 'Hide' : 'Inspect'} Comparative Trace</span>
+          <span>{showTrace ? 'Hide' : 'See'} Calculation Breakdown</span>
           {showTrace ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* Comparative Rule Trace Table */}
+      {/* Calculation Breakdown Table */}
       {showTrace && (
         <div className="steep-card p-6 space-y-4 animate-in fade-in duration-200">
-          <h3 className="font-editorial text-xl font-bold text-ink">Side-by-Side Deterministic Rule Sequence</h3>
-          <p className="text-xs text-slate">Detailed breakdown showing exact mathematical parameters evaluated by the FAIR rules engine.</p>
+          <div>
+            <h3 className="font-editorial text-xl font-bold text-ink">Calculation Breakdown</h3>
+            <p className="text-xs text-slate mt-1">
+              Each row shows a risk factor and how much it contributes to the financial exposure for each organization.
+            </p>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-mist text-slate uppercase">
-                  <th className="py-2.5 px-3">Rule ID</th>
-                  <th className="py-2.5 px-3">Rule Description</th>
-                  <th className="py-2.5 px-3 text-right">MSME Impact</th>
+                  <th className="py-2.5 px-3">Risk Factor</th>
+                  <th className="py-2.5 px-3 text-right">Small Business Impact</th>
                   <th className="py-2.5 px-3 text-right">Enterprise Impact</th>
-                  <th className="py-2.5 px-3">Mathematical Basis</th>
+                  <th className="py-2.5 px-3">Why Different?</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-mist">
@@ -239,7 +247,6 @@ export const Pillar1ComparisonView: React.FC = () => {
                   const msmeMatch = data.msme_rule_trace.find((m) => m.rule_id === entRule.rule_id);
                   return (
                     <tr key={entRule.rule_id} className="hover:bg-fog/60 transition">
-                      <td className="py-3 px-3 font-mono font-bold text-ink">{entRule.rule_id}</td>
                       <td className="py-3 px-3 font-medium text-ink">{entRule.description}</td>
                       <td className="py-3 px-3 text-right font-semibold text-slate">
                         {msmeMatch ? formatInr(msmeMatch.contribution_inr) : '—'}
