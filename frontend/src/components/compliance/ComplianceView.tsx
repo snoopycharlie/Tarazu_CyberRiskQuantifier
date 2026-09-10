@@ -45,7 +45,7 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
           <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
             Regulatory Compliance
           </span>
-          <h1 className="font-editorial text-4xl md:text-5xl font-bold text-ink tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
             Compliance Readiness
           </h1>
           <p className="text-slate text-base mt-1 max-w-2xl">
@@ -93,7 +93,7 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
               <div>
                 <span className="text-xs uppercase font-bold tracking-wider text-slate">Framework Readiness Score</span>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <h3 className="font-editorial text-4xl font-bold text-sienna">{data.coverage_pct}%</h3>
+                  <h3 className="text-4xl font-bold text-sienna">{data.coverage_pct}%</h3>
                   <span className="text-xs text-slate font-medium">
                     {data.satisfied} of {data.total_clauses} clauses satisfied
                   </span>
@@ -131,7 +131,7 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
 
           {/* Filter Bar */}
           <div className="flex items-center justify-between">
-            <h3 className="font-editorial text-xl font-bold text-ink">Requirements Review</h3>
+            <h3 className="text-xl font-bold text-ink">Requirements Review</h3>
             <div className="flex items-center gap-1 bg-fog p-1 rounded-pill border border-mist text-xs">
               <button
                 onClick={() => setFilterStatus('all')}

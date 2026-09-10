@@ -58,7 +58,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
         <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
           Security Investment Planning
         </span>
-        <h1 className="font-editorial text-4xl md:text-5xl font-bold text-ink tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
           Investment Advisor
         </h1>
         <p className="text-slate text-base mt-2 max-w-3xl">
@@ -72,7 +72,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-mist">
           <div>
             <span className="text-xs uppercase font-bold tracking-wider text-slate">Available Security Budget</span>
-            <h3 className="font-editorial text-3xl font-bold text-sienna mt-1">{formatInr(budget)}</h3>
+            <h3 className="text-3xl font-bold text-sienna mt-1">{formatInr(budget)}</h3>
             <p className="text-xs text-slate mt-0.5">
               Adjust the slider to see recommendations for different budget levels.
             </p>
@@ -133,7 +133,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                 <span className="text-xs font-bold uppercase tracking-wider text-sienna/80">
                   Potential Exposure Reduction
                 </span>
-                <div className="font-editorial text-4xl font-bold text-sienna mt-2">
+                <div className="text-4xl font-bold text-sienna mt-2">
                   {formatInr(optResult.total_risk_reduction_inr)}
                 </div>
                 <div className="mt-4 pt-4 border-t border-sienna/20 space-y-1.5 text-xs text-sienna font-medium">
@@ -201,7 +201,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-editorial text-xl font-bold text-ink">
+                    <h3 className="text-xl font-bold text-ink">
                       Return on Security Investment (ROSI) Curve
                     </h3>
                     <p className="text-xs text-slate mt-0.5">
@@ -262,7 +262,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
 
           {/* Recommended Improvements Table */}
           <div className="steep-card p-6">
-            <h3 className="font-editorial text-xl font-bold text-ink mb-1">
+            <h3 className="text-xl font-bold text-ink mb-1">
               Recommended Security Improvements
             </h3>
             <p className="text-xs text-slate mb-4">

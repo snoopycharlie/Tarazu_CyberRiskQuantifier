@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Scale, Eye, EyeOff, Lock, Mail, ArrowRight, ShieldCheck, TrendingDown, Network } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Scale, Eye, EyeOff, Lock, Mail, ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import { authLogin, DemoUser } from '../../utils/auth';
 
 interface LoginPageProps {
@@ -23,7 +24,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     }
 
     setLoading(true);
-    // Simulate network delay for realism
     await new Promise((r) => setTimeout(r, 600));
 
     const result = authLogin(email, password);
@@ -36,229 +36,173 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     }
   };
 
-  const handleQuickLogin = async (e: React.MouseEvent, preset: 'admin' | 'judge') => {
+  const handleDemoAccess = async (e: React.MouseEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     await new Promise((r) => setTimeout(r, 400));
-    const creds =
-      preset === 'admin'
-        ? { email: 'admin@tarazu.demo', password: 'tarazu2026' }
-        : { email: 'judge@sih.demo', password: 'sih2026' };
-    const result = authLogin(creds.email, creds.password);
+    const result = authLogin('admin@tarazu.demo', 'tarazu2026');
     setLoading(false);
     if (result.success && result.user) onLogin(result.user);
   };
 
   return (
-    <div className="min-h-screen bg-fog flex">
-      {/* Left Panel — Branding & Product Story */}
-      <div className="hidden lg:flex lg:w-1/2 bg-ink flex-col justify-between p-12 relative overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
+    <div className="min-h-screen flex bg-fog">
+      {/* ── LEFT PANEL — Minimal Branding ──────────────────────── */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-16 relative overflow-hidden bg-[#0B1220]">
+        {/* Subtle grid background */}
+        <div 
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
 
         {/* Logo */}
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-2xl bg-sienna flex items-center justify-center shadow-lg">
-              <Scale className="w-6 h-6 text-peach" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-cyber-blue shadow-soft">
+              <Scale className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <span className="font-editorial text-3xl font-bold text-paper tracking-tight">Tarazu</span>
-              <p className="text-paper/50 text-xs">Continuous Cyber Risk Financial Quantification</p>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <div>
-              <h1 className="font-editorial text-5xl font-bold text-paper leading-tight tracking-tight">
-                Understand your
-                <span className="text-peach block">cyber risk</span>
-                in financial terms.
-              </h1>
-              <p className="text-paper/60 text-base mt-4 leading-relaxed max-w-md">
-                Tarazu translates complex cybersecurity vulnerabilities into clear financial exposure estimates — 
-                helping business leaders make smarter security investment decisions.
-              </p>
-            </div>
-
-            {/* Three pillars */}
-            <div className="space-y-4">
-              {[
-                {
-                  icon: TrendingDown,
-                  title: 'Risk Changes With Business Size',
-                  desc: 'Same vulnerability, different financial impact based on your organization.',
-                },
-                {
-                  icon: Network,
-                  title: 'See How Risk Can Spread',
-                  desc: 'Understand which connected systems are at risk if one is compromised.',
-                },
-                {
-                  icon: ShieldCheck,
-                  title: 'Decide Where to Invest',
-                  desc: 'AI-supported recommendations for maximum security return on investment.',
-                },
-              ].map((item) => (
-                <div key={item.title} className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-xl bg-paper/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <item.icon className="w-4 h-4 text-peach" />
-                  </div>
-                  <div>
-                    <h3 className="text-paper text-sm font-semibold">{item.title}</h3>
-                    <p className="text-paper/50 text-xs mt-0.5 leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <span className="text-2xl font-bold text-white tracking-tight">Tarazu</span>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="relative z-10 flex items-center justify-between text-paper/30 text-xs">
-          <span>SIH26105 · Smart India Hackathon 2026</span>
-          <span>Rules-Before-AI Architecture · FAIR-Calibrated</span>
+        {/* Core Message */}
+        <div className="relative z-10 max-w-md">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight mb-6">
+            Cyber Risk.<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyber-blue to-cyber-cyan">Quantified.</span>
+          </h1>
+          <p className="text-lg text-slate-400">
+            Translate complex vulnerabilities into clear financial exposure to drive smarter security investments.
+          </p>
+        </div>
+
+        <div className="relative z-10 text-sm text-slate-500 flex justify-between">
+          <span>Enterprise Risk Management</span>
+          <span>SIH26105</span>
         </div>
       </div>
 
-      {/* Right Panel — Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-sienna flex items-center justify-center">
-              <Scale className="w-5 h-5 text-peach" />
+      {/* ── RIGHT PANEL — Form ──────────────────────────────── */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-page">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="w-full max-w-[420px]"
+        >
+          
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-cyber-blue shadow-soft">
+              <Scale className="w-5 h-5 text-white" />
             </div>
-            <span className="font-editorial text-2xl font-bold text-ink">Tarazu</span>
+            <span className="text-2xl font-bold text-ink tracking-tight">Tarazu</span>
           </div>
 
-          <div>
-            <h2 className="font-editorial text-3xl font-bold text-ink">Sign in</h2>
-            <p className="text-slate text-sm mt-1">Access your cyber risk dashboard.</p>
+          <div className="mb-10">
+            <h2 className="text-3xl font-bold text-ink tracking-tight">Sign in</h2>
+            <p className="text-slate mt-2 text-base">Enter your details to access the platform.</p>
           </div>
 
-          {/* Quick Login Cards for Demo */}
-          <div className="p-4 rounded-2xl bg-peach/40 border border-sienna/20 space-y-3">
-            <p className="text-xs font-bold text-sienna uppercase tracking-wider">
-              Demo Credentials — Quick Access
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={(e) => handleQuickLogin(e, 'admin')}
-                disabled={loading}
-                className="p-3 rounded-xl bg-white/70 border border-sienna/20 text-left hover:bg-white transition group"
-              >
-                <div className="text-xs font-bold text-sienna group-hover:text-ink transition">Risk Analyst</div>
-                <div className="text-[11px] text-slate mt-0.5">admin@tarazu.demo</div>
-              </button>
-              <button
-                onClick={(e) => handleQuickLogin(e, 'judge')}
-                disabled={loading}
-                className="p-3 rounded-xl bg-white/70 border border-sienna/20 text-left hover:bg-white transition group"
-              >
-                <div className="text-xs font-bold text-sienna group-hover:text-ink transition">SIH Judge</div>
-                <div className="text-[11px] text-slate mt-0.5">judge@sih.demo</div>
-              </button>
+          {/* Demo Access */}
+          <div className="mb-8 p-5 rounded-xl border border-cyber-blue/20 bg-cyber-blue/5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-cyber-blue" />
+                <span className="text-sm font-semibold uppercase tracking-wider text-cyber-blue">Demo Access</span>
+              </div>
+              <span className="text-xs text-slate">admin@tarazu.demo</span>
             </div>
+            <button
+              onClick={handleDemoAccess}
+              disabled={loading}
+              className="w-full mt-3 py-3 rounded-lg text-sm font-semibold border border-cyber-blue/30 bg-cyber-blue/10 text-cyber-blue hover:bg-cyber-blue/20 transition-all flex justify-center items-center h-[48px]"
+            >
+              {loading ? 'Authenticating...' : 'Quick Demo Login'}
+            </button>
           </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 mb-8">
             <div className="flex-1 h-px bg-mist" />
-            <span className="text-xs text-slate font-medium">or sign in manually</span>
+            <span className="text-sm font-medium text-slate">or sign in manually</span>
             <div className="flex-1 h-px bg-mist" />
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="text-xs font-semibold text-slate uppercase tracking-wider block mb-1.5">
-                Email
+              <label htmlFor="login-email" className="block text-sm font-medium text-ink mb-2">
+                Work Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-smoke pointer-events-none" />
                 <input
-                  id="email"
+                  id="login-email"
                   type="email"
                   autoComplete="email"
                   placeholder="you@organization.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-mist bg-white text-ink text-sm font-medium focus:outline-none focus:border-sienna/50 focus:ring-2 focus:ring-sienna/10 transition"
+                  className="cyber-input pl-12 h-[52px]"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="text-xs font-semibold text-slate uppercase tracking-wider block mb-1.5">
+              <label htmlFor="login-password" className="block text-sm font-medium text-ink mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-smoke pointer-events-none" />
                 <input
-                  id="password"
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-mist bg-white text-ink text-sm font-medium focus:outline-none focus:border-sienna/50 focus:ring-2 focus:ring-sienna/10 transition"
+                  className="cyber-input pl-12 pr-12 h-[52px]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate hover:text-ink transition"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-smoke hover:text-slate transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Error */}
             {error && (
-              <div className="p-3 rounded-xl bg-crimson/10 border border-crimson/20 text-crimson text-xs font-medium">
-                {error}
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-risk-critical-bg border border-risk-critical-border text-risk-critical">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <span className="text-sm font-medium">{error}</span>
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-ink text-paper text-sm font-semibold hover:bg-black transition flex items-center justify-center gap-2 disabled:opacity-60 shadow-sm"
+              className="btn-primary w-full h-[52px] text-base"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-paper border-t-transparent rounded-full animate-spin" />
-                  <span>Signing in…</span>
+                  <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  <span>Signing in...</span>
                 </>
               ) : (
                 <>
                   <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate">
-            Tarazu · AI-Powered Cyber Risk Platform ·{' '}
-            <span className="font-semibold text-sienna">SIH26105</span>
-          </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

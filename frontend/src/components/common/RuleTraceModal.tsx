@@ -45,7 +45,7 @@ export const RuleTraceModal: React.FC<RuleTraceModalProps> = ({
               </span>
               <span className="text-xs text-slate">Audit-Ready Mathematical Breakdown</span>
             </div>
-            <h2 className="font-editorial text-2xl font-bold text-ink mt-1">{title}</h2>
+            <h2 className="text-2xl font-bold text-ink mt-1">{title}</h2>
             {subtitle && <p className="text-xs text-slate mt-0.5">{subtitle}</p>}
           </div>
           <button
@@ -60,7 +60,7 @@ export const RuleTraceModal: React.FC<RuleTraceModalProps> = ({
         <div className="px-6 py-4 bg-peach/40 border-b border-peach/50 flex items-center justify-between">
           <div>
             <span className="text-xs uppercase font-medium text-sienna tracking-wider">Quantified Financial Risk (EAL)</span>
-            <div className="text-3xl font-editorial font-bold text-sienna">{formatInr(ealInr)}</div>
+            <div className="text-3xl font-bold text-sienna">{formatInr(ealInr)}</div>
           </div>
           <div className="text-right">
             <span className="text-xs text-slate block">Triggered Rules</span>

@@ -26,7 +26,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-peach text-sienna uppercase tracking-wider">
               EXECUTIVE BOARD AUDIT EXPORT
             </span>
-            <h3 className="font-editorial text-xl font-bold text-ink mt-0.5">
+            <h3 className="text-xl font-bold text-ink mt-0.5">
               Printable Cyber Risk Quantification Audit
             </h3>
           </div>

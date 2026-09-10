@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Organization, Sheet, DashboardSummary } from './types';
 import { api } from './services/api';
 import { Navbar } from './components/common/Navbar';
@@ -163,8 +164,11 @@ export const App: React.FC = () => {
   // Don't render until auth is checked
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-fog flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-sienna border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-fog">
+        <div
+          className="w-10 h-10 rounded-full border-2 animate-spin"
+          style={{ borderColor: 'rgba(59,130,246,0.2)', borderTopColor: '#3b82f6' }}
+        />
       </div>
     );
   }
@@ -175,7 +179,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-fog text-ink font-sans">
+    <div className="min-h-screen flex flex-col font-sans bg-fog text-ink">
       {/* Top Navigation */}
       <Navbar
         currentOrg={currentOrg}
@@ -193,29 +197,39 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Suspense
           fallback={
-            <div className="py-24 text-center">
-              <div className="w-10 h-10 border-4 border-sienna border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-slate text-sm font-medium">Preparing your workspace…</p>
+            <div className="py-32 text-center">
+              <div
+                className="w-10 h-10 rounded-full border-2 animate-spin mx-auto mb-4 border-cyber-blue/20 border-t-cyber-blue"
+              />
+              <p className="text-sm font-medium text-slate">Preparing your workspace…</p>
             </div>
           }
         >
-          {activeTab === 'dashboard' && (
-            <DashboardView
-              summary={dashboard}
-              sheets={sheets}
-              loading={loading}
-              onNavigateTab={setActiveTab}
-              onSelectSheet={(sheet) => {
-                setActiveSheet(sheet);
-                setActiveTab('sheets');
-              }}
-            />
-          )}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === 'dashboard' && (
+                <DashboardView
+                  summary={dashboard}
+                  sheets={sheets}
+                  loading={loading}
+                  onNavigateTab={setActiveTab}
+                  onSelectSheet={(sheet) => {
+                    setActiveSheet(sheet);
+                    setActiveTab('sheets');
+                  }}
+                />
+              )}
 
-          {activeTab === 'pillar1' && <Pillar1ComparisonView />}
+              {activeTab === 'pillar1' && <Pillar1ComparisonView />}
 
           {activeTab === 'pillar2' && (
             <Pillar2GraphView
@@ -252,26 +266,26 @@ export const App: React.FC = () => {
             />
           )}
 
-          {activeTab === 'settings' && (
-            <SettingsView currentUser={currentUser} onLogout={handleLogout} />
-          )}
+            {activeTab === 'settings' && (
+              <SettingsView currentUser={currentUser} onLogout={handleLogout} />
+            )}
+            </motion.div>
+          </AnimatePresence>
         </Suspense>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-mist bg-white/70 py-5 mt-12 text-xs text-slate">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <footer className="py-4 mt-8 text-xs border-t border-mist bg-fog/60 backdrop-blur-md">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-slate">
           <div className="flex items-center gap-2">
-            <span className="font-editorial font-bold text-ink">Tarazu</span>
+            <span className="font-semibold text-ink">Tarazu</span>
             <span>·</span>
             <span>AI-Powered Cyber Risk Platform</span>
-            <span>·</span>
-            <span className="font-semibold text-sienna">SIH26105</span>
           </div>
-          <div className="flex items-center gap-3 text-[11px]">
-            <span>FAIR-Calibrated Risk Engine</span>
+          <div className="flex items-center gap-2 text-smoke">
+            <span>FAIR-Calibrated</span>
             <span>·</span>
-            <span>Rules-Before-AI Architecture</span>
+            <span>Rules-Before-AI</span>
             <span>·</span>
             <span>NIST NVD API v2.0</span>
           </div>

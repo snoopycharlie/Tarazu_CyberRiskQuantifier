@@ -51,7 +51,7 @@ export const NewOrgModal: React.FC<NewOrgModalProps> = ({
         <div className="flex items-center justify-between pb-4 border-b border-mist">
           <div className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-sienna" />
-            <h3 className="font-editorial text-xl font-bold text-ink">New Organization Profile</h3>
+            <h3 className="text-xl font-bold text-ink">New Organization Profile</h3>
           </div>
           <button onClick={onClose} className="text-slate hover:text-ink p-1">
             <X className="w-5 h-5" />

@@ -108,10 +108,13 @@ export const DemoGuide: React.FC<DemoGuideProps> = ({ onNavigate, onClose, isOpe
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
       <div className="bg-ink text-paper rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
         {/* Progress bar */}
-        <div className="h-1 bg-white/10">
+        <div className="h-0.5" style={{ background: 'rgba(51,65,85,0.5)' }}>
           <div
-            className="h-full bg-peach transition-all duration-500"
-            style={{ width: `${((currentStep + 1) / DEMO_STEPS.length) * 100}%` }}
+            className="h-full transition-all duration-500"
+            style={{
+              width: `${((currentStep + 1) / DEMO_STEPS.length) * 100}%`,
+              background: 'linear-gradient(90deg, #2563eb, #06b6d4)',
+            }}
           />
         </div>
 
@@ -120,15 +123,15 @@ export const DemoGuide: React.FC<DemoGuideProps> = ({ onNavigate, onClose, isOpe
             <div className="flex-1 min-w-0">
               {/* Step indicator */}
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold text-peach/70 uppercase tracking-widest">
+                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#60a5fa' }}>
                   Demo Guide
                 </span>
-                <span className="text-[10px] text-paper/40">
+                <span className="text-[10px]" style={{ color: 'rgba(148,163,184,0.4)' }}>
                   Step {step.step} of {DEMO_STEPS.length}
                 </span>
               </div>
 
-              <h3 className="font-editorial text-lg font-bold text-paper leading-tight">
+              <h3 className="text-lg font-bold text-paper leading-tight">
                 {step.title}
               </h3>
               <p className="text-paper/60 text-xs mt-1.5 leading-relaxed">
@@ -136,9 +139,12 @@ export const DemoGuide: React.FC<DemoGuideProps> = ({ onNavigate, onClose, isOpe
               </p>
 
               {/* Highlight */}
-              <div className="mt-3 flex items-start gap-2 p-3 rounded-xl bg-white/8 border border-white/10">
-                <span className="text-peach text-xs">→</span>
-                <p className="text-peach/90 text-xs leading-relaxed font-medium">
+              <div
+                className="mt-3 flex items-start gap-2 p-3 rounded-xl"
+                style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)' }}
+              >
+                <span className="text-xs" style={{ color: '#60a5fa' }}>→</span>
+                <p className="text-xs leading-relaxed font-medium" style={{ color: '#93c5fd' }}>
                   {step.highlight}
                 </p>
               </div>
@@ -164,13 +170,16 @@ export const DemoGuide: React.FC<DemoGuideProps> = ({ onNavigate, onClose, isOpe
                     setCurrentStep(i);
                     goTo(DEMO_STEPS[i].tab);
                   }}
-                  className={`rounded-full transition-all ${
-                    i === currentStep
-                      ? 'w-5 h-2 bg-peach'
+                  className="rounded-full transition-all"
+                  style={{
+                    width: i === currentStep ? '20px' : '8px',
+                    height: '8px',
+                    background: i === currentStep
+                      ? '#3b82f6'
                       : i < currentStep
-                      ? 'w-2 h-2 bg-peach/50'
-                      : 'w-2 h-2 bg-white/20'
-                  }`}
+                      ? 'rgba(59,130,246,0.35)'
+                      : 'rgba(255,255,255,0.15)',
+                  }}
                 />
               ))}
             </div>
@@ -198,7 +207,12 @@ export const DemoGuide: React.FC<DemoGuideProps> = ({ onNavigate, onClose, isOpe
 
               <button
                 onClick={next}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-pill bg-peach text-ink text-xs font-bold hover:bg-peach/80 transition"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                  color: '#ffffff',
+                  boxShadow: '0 0 12px rgba(59,130,246,0.3)',
+                }}
               >
                 <span>{isLast ? 'Finish' : 'Next'}</span>
                 {!isLast && <ChevronRight className="w-3.5 h-3.5" />}
@@ -219,7 +233,20 @@ interface DemoGuideButtonProps {
 export const DemoGuideButton: React.FC<DemoGuideButtonProps> = ({ onClick }) => (
   <button
     onClick={onClick}
-    className="flex items-center gap-2 px-3.5 py-2 rounded-pill bg-sienna/10 border border-sienna/20 text-sienna text-xs font-semibold hover:bg-sienna/20 transition"
+    className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all"
+    style={{
+      background: 'rgba(59,130,246,0.08)',
+      border: '1px solid rgba(59,130,246,0.2)',
+      color: '#93c5fd',
+    }}
+    onMouseEnter={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(59,130,246,0.15)';
+      (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(59,130,246,0.35)';
+    }}
+    onMouseLeave={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(59,130,246,0.08)';
+      (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(59,130,246,0.2)';
+    }}
   >
     <BookOpen className="w-3.5 h-3.5" />
     <span>Demo Guide</span>

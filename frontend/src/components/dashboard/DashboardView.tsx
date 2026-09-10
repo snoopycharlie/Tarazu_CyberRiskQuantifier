@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, Variants } from 'framer-motion';
 import {
   Shield, AlertTriangle, Layers, ChevronRight, TrendingDown, Network, Wallet,
   Info, ChevronDown, ChevronUp, ArrowUpRight
@@ -37,10 +38,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const isoPct = summary.compliance_iso27001.coverage_pct;
   const avgCompliancePct = Math.round((rbiPct + isoPct) / 2);
 
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-8"
+    >
+      {/* ── Page Header ─────────────────────────────────────────── */}
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
             {summary.org_name} · Risk Overview
@@ -81,13 +100,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <ChevronRight className="w-3 h-3 text-slate" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Estimated Annual Financial Exposure — Hero Card */}
-        <div className="steep-card-peach p-6 flex flex-col justify-between lg:col-span-1">
-          <div>
+      {/* ── KPI Cards ────────────────────────────────────────────── */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Hero Card — Annual Financial Exposure */}
+        <div className="p-6 rounded-xl flex flex-col justify-between relative overflow-hidden bg-risk-critical/5 border border-risk-critical/20 shadow-soft">
+          <div className="relative z-10">
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase font-bold tracking-wider text-sienna/80">
                 Annual Financial Exposure
@@ -107,10 +126,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {showEalExplainer && (
-            <div className="mt-3 p-3 rounded-xl bg-white/60 border border-sienna/20 text-[11px] text-sienna/80 leading-relaxed">
-              The estimated amount your organization could potentially lose from cyber incidents in a typical year,
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="relative z-10 mt-5 p-4 rounded-xl text-sm leading-relaxed bg-risk-critical/10 border border-risk-critical/20 text-risk-critical/90"
+            >
+              The estimated amount your organization could lose from cyber incidents in a typical year,
               based on your assets, vulnerabilities, and business size.
-            </div>
+            </motion.div>
           )}
 
           {!showEalExplainer && (
@@ -168,10 +191,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span>ISO 27001: {summary.compliance_iso27001.satisfied}/{summary.compliance_iso27001.total}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Infrastructure Segments */}
-      <div className="space-y-3">
+      {/* ── Infrastructure Segments ──────────────────────────────── */}
+      <motion.div variants={itemVariants} className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="font-editorial text-2xl font-bold text-ink">Infrastructure Segments</h2>
           <button
@@ -226,10 +249,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Top Risk Contributors & Quick Wins */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* ── Bottom 2-col ─────────────────────────────────────────── */}
+      <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
         {/* Top Risk Contributors */}
         <div className="steep-card p-6">
           <div className="flex items-center justify-between mb-4">
@@ -311,7 +334,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

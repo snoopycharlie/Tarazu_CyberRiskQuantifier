@@ -98,7 +98,7 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
               </span>
               <span className="text-xs text-slate">NIST NVD Live Auto-Match</span>
             </div>
-            <h2 className="font-editorial text-2xl font-bold text-ink mt-1">Register Monitored Asset</h2>
+            <h2 className="text-2xl font-bold text-ink mt-1">Register Monitored Asset</h2>
           </div>
           <button onClick={onClose} className="text-slate hover:text-ink p-1">
             <X className="w-5 h-5" />

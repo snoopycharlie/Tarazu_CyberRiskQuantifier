@@ -4,68 +4,281 @@
 
 @layer base {
   :root {
-    --color-ink-black: #17191c;
-    --color-paper-white: #ffffff;
-    --color-mist-gray: #f2f2f3;
-    --color-fog-white: #fafafb;
-    --color-slate-gray: #777b86;
-    --color-ash-gray: #979799;
-    --color-smoke-gray: #a3a6af;
-    --color-blush-peach: #fbe1d1;
-    --color-sienna-brown: #5d2a1a;
+    /* ── Light Theme (Premium Fintech/Enterprise) ── */
+    --bg-page: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-hover: #f1f5f9;
+    --bg-elevated: #ffffff;
+    
+    --border-subtle: #e2e8f0;
+    --border-strong: #cbd5e1;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    
+    --accent-primary: #2563eb;
+    --accent-primary-hover: #1d4ed8;
+    --accent-subtle: #eff6ff;
+    
+    /* Risk Semantic Colors */
+    --risk-critical: #dc2626;
+    --risk-critical-bg: #fef2f2;
+    --risk-critical-border: #fca5a5;
+    
+    --risk-high: #d97706;
+    --risk-high-bg: #fffbeb;
+    --risk-high-border: #fcd34d;
+    
+    --risk-medium: #2563eb;
+    --risk-medium-bg: #eff6ff;
+    --risk-medium-border: #93c5fd;
+    
+    --risk-low: #059669;
+    --risk-low-bg: #ecfdf5;
+    --risk-low-border: #6ee7b7;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    
+    --scrollbar-bg: #f8fafc;
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-thumb-hover: #94a3b8;
+  }
+
+  .dark {
+    /* ── Dark Theme (Cybersecurity Command Center) ── */
+    --bg-page: #0B1220;
+    --bg-surface: #101827;
+    --bg-surface-hover: #151F31;
+    --bg-elevated: #1B2639;
+    
+    --border-subtle: #1e293b;
+    --border-strong: #334155;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --accent-primary: #3b82f6;
+    --accent-primary-hover: #60a5fa;
+    --accent-subtle: rgba(59, 130, 246, 0.1);
+    
+    /* Risk Semantic Colors */
+    --risk-critical: #ef4444;
+    --risk-critical-bg: rgba(239, 68, 68, 0.1);
+    --risk-critical-border: rgba(239, 68, 68, 0.3);
+    
+    --risk-high: #f59e0b;
+    --risk-high-bg: rgba(245, 158, 11, 0.1);
+    --risk-high-border: rgba(245, 158, 11, 0.3);
+    
+    --risk-medium: #3b82f6;
+    --risk-medium-bg: rgba(59, 130, 246, 0.1);
+    --risk-medium-border: rgba(59, 130, 246, 0.3);
+    
+    --risk-low: #10b981;
+    --risk-low-bg: rgba(16, 185, 129, 0.1);
+    --risk-low-border: rgba(16, 185, 129, 0.3);
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 25px -3px rgb(0 0 0 / 0.5), 0 4px 10px -4px rgb(0 0 0 / 0.5);
+    
+    --scrollbar-bg: #0B1220;
+    --scrollbar-thumb: #334155;
+    --scrollbar-thumb-hover: #475569;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    background-color: #fafafb;
-    color: #17191c;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  h1, h2, h3, .font-editorial {
-    font-family: 'Source Serif 4', Georgia, serif;
+  /* Force Inter everywhere, override editorial */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 }
 
-/* Custom aesthetic utility classes following Steep design system */
-.steep-card {
-  background-color: #ffffff;
-  border: 1px solid #f2f2f3;
-  border-radius: 24px;
-  box-shadow: 0 4px 20px -2px rgba(23, 25, 28, 0.04);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* ──────────────────────────────────────────────────────────────
+   COMPONENT CLASSES (Theme-aware)
+   ────────────────────────────────────────────────────────────── */
+@layer components {
+  /* Standardized Card */
+  .tarazu-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tarazu-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Elevated Card (Modals, Dropdowns) */
+  .tarazu-card-elevated {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Legacy remappings to prevent immediate breakage */
+  .cyber-card, .steep-card {
+    @apply tarazu-card;
+  }
+
+  .steep-card-peach {
+    background-color: var(--accent-subtle);
+    border: 1px solid var(--accent-primary);
+    border-radius: 12px;
+    color: var(--accent-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .glass-panel {
+    @apply tarazu-card-elevated;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(var(--bg-elevated), 0.85); /* Requires separate handling or just use solid */
+  }
+
+  /* ── Risk badges ─────────────────────────────────────── */
+  .risk-badge {
+    @apply inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-semibold whitespace-nowrap border;
+  }
+
+  .risk-badge-critical {
+    @apply risk-badge;
+    background-color: var(--risk-critical-bg);
+    color: var(--risk-critical);
+    border-color: var(--risk-critical-border);
+  }
+
+  .risk-badge-high {
+    @apply risk-badge;
+    background-color: var(--risk-high-bg);
+    color: var(--risk-high);
+    border-color: var(--risk-high-border);
+  }
+
+  .risk-badge-medium {
+    @apply risk-badge;
+    background-color: var(--risk-medium-bg);
+    color: var(--risk-medium);
+    border-color: var(--risk-medium-border);
+  }
+
+  .risk-badge-low {
+    @apply risk-badge;
+    background-color: var(--risk-low-bg);
+    color: var(--risk-low);
+    border-color: var(--risk-low-border);
+  }
+
+  /* ── Buttons ─────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ease-out border border-transparent whitespace-nowrap cursor-pointer;
+    background-color: var(--accent-primary);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--accent-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed transform-none shadow-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-out whitespace-nowrap cursor-pointer;
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--bg-surface-hover);
+  }
+
+  .btn-secondary:disabled {
+    @apply opacity-50 cursor-not-allowed transform-none shadow-none;
+  }
+
+  /* ── Form inputs ─────────────────────────────────────── */
+  .cyber-input {
+    @apply w-full px-4 py-2.5 rounded-lg text-[15px] transition-all duration-150 ease-out outline-none font-sans;
+    border: 1px solid var(--border-strong);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+  }
+
+  .cyber-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .cyber-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-subtle);
+  }
+
+  /* ── Status dot ──────────────────────────────────────── */
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+
+  .status-dot-online { background-color: var(--risk-low); }
+  .status-dot-warning { background-color: var(--risk-high); }
+  .status-dot-critical { background-color: var(--risk-critical); }
 }
 
-.steep-card:hover {
-  box-shadow: 0 8px 30px -4px rgba(23, 25, 28, 0.08);
+/* ──────────────────────────────────────────────────────────────
+   CUSTOM SCROLLBAR
+   ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg); }
+
+/* ──────────────────────────────────────────────────────────────
+   UTILITY OVERRIDES
+   ────────────────────────────────────────────────────────────── */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { scrollbar-width: none; }
+
+/* Focus-visible ring */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
-.steep-card-peach {
-  background-color: #fbe1d1;
-  border: 1px solid rgba(93, 42, 26, 0.12);
-  border-radius: 24px;
-  color: #5d2a1a;
-}
-
-.steep-pill {
-  border-radius: 9999px;
-  padding: 6px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.15s ease;
-}
-
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #fafafb;
-}
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+/* Base setup for xyflow to ensure it works correctly */
+.react-flow__node {
+  border-radius: 12px;
 }

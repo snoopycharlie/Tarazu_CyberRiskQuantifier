@@ -483,7 +483,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             </span>
             <span className="text-xs text-slate">Operational Modules</span>
           </div>
-          <h1 className="font-editorial text-4xl md:text-5xl font-bold text-ink tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
             Document Ingestion & RAG Advisory
           </h1>
           <p className="text-slate text-base mt-2 max-w-3xl">
@@ -528,7 +528,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           <div className="steep-card p-6 space-y-5">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
               <div>
-                <h3 className="font-editorial text-2xl font-bold text-ink">
+                <h3 className="text-2xl font-bold text-ink">
                   Multi-Modal Document Parsing Pipeline
                 </h3>
                 <p className="text-xs text-slate mt-0.5">
@@ -731,7 +731,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                 <div className="steep-card p-6 space-y-3">
                   <div className="flex items-center justify-between pb-3 border-b border-mist">
                     <div>
-                      <h3 className="font-editorial text-xl font-bold text-ink">Extracted Security Controls</h3>
+                      <h3 className="text-xl font-bold text-ink">Extracted Security Controls</h3>
                       <p className="text-xs text-slate">Parsed clauses mapped to Tarazu control catalog</p>
                     </div>
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-fog border border-mist text-slate">
@@ -771,7 +771,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                 <div className="steep-card p-6 space-y-3">
                   <div className="flex items-center justify-between pb-3 border-b border-mist">
                     <div>
-                      <h3 className="font-editorial text-xl font-bold text-ink">Discovered Infrastructure Assets</h3>
+                      <h3 className="text-xl font-bold text-ink">Discovered Infrastructure Assets</h3>
                       <p className="text-xs text-slate">Extracted hostnames, cloud resources & databases</p>
                     </div>
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-fog border border-mist text-slate">
@@ -873,7 +873,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <div className="steep-card p-6 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
                 <div>
-                  <h3 className="font-editorial text-2xl font-bold text-ink">
+                  <h3 className="text-2xl font-bold text-ink">
                     DPDP Act 2023 Statutory Liability Calculator
                   </h3>
                   <p className="text-xs text-slate mt-0.5">
@@ -897,7 +897,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   <div>
                     <div className="flex justify-between text-xs mb-1.5">
                       <span className="font-bold text-slate uppercase">Potentially Compromised Data Records:</span>
-                      <span className="font-editorial text-lg font-bold text-sienna">{dpdpRecords.toLocaleString('en-IN')} Principals</span>
+                      <span className="text-lg font-bold text-sienna">{dpdpRecords.toLocaleString('en-IN')} Principals</span>
                     </div>
                     <input
                       type="range"
@@ -989,7 +989,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     <span className="text-xs font-bold text-sienna/80 uppercase tracking-wider block">
                       Assessed Statutory Liability
                     </span>
-                    <div className="font-editorial text-4xl font-bold text-sienna">
+                    <div className="text-4xl font-bold text-sienna">
                       {dpdpResult ? formatInr(dpdpResult.assessed_regulatory_penalty_inr) : '₹1.85 Cr'}
                     </div>
                     <div className="pt-2 border-t border-sienna/20 text-xs text-sienna/90 space-y-1">
@@ -1024,7 +1024,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <div className="steep-card p-6 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
                 <div>
-                  <h3 className="font-editorial text-2xl font-bold text-ink">
+                  <h3 className="text-2xl font-bold text-ink">
                     Quantitative Board Risk Presentation Deck
                   </h3>
                   <p className="text-xs text-slate mt-0.5">
@@ -1083,7 +1083,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                           <span className="text-[10px] uppercase font-bold tracking-widest text-sienna">
                             Slide {boardDeckData.slides[activeSlideIndex].slide_number} of {boardDeckData.slides.length}
                           </span>
-                          <h2 className="font-editorial text-3xl font-bold text-ink mt-0.5">
+                          <h2 className="text-3xl font-bold text-ink mt-0.5">
                             {boardDeckData.slides[activeSlideIndex].title}
                           </h2>
                           <p className="text-xs text-slate mt-0.5">
@@ -1102,7 +1102,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                             <span className="text-[11px] uppercase font-bold text-slate block mb-1">
                               {kpi.label}
                             </span>
-                            <span className="font-editorial text-2xl font-bold text-ink">
+                            <span className="text-2xl font-bold text-ink">
                               {kpi.value}
                             </span>
                           </div>
@@ -1130,7 +1130,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <div className="steep-card p-6 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
                 <div>
-                  <h3 className="font-editorial text-2xl font-bold text-ink">
+                  <h3 className="text-2xl font-bold text-ink">
                     Vendor Contract Review Agent
                   </h3>
                   <p className="text-xs text-slate mt-0.5">
@@ -1163,7 +1163,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   {/* Score & Verdict Banner */}
                   <div className="p-6 rounded-3xl bg-fog border border-mist flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-2xl bg-peach text-sienna flex items-center justify-center font-editorial text-3xl font-bold shrink-0">
+                      <div className="w-16 h-16 rounded-2xl bg-peach text-sienna flex items-center justify-center text-3xl font-bold shrink-0">
                         {vendorReviewResult.contract_security_score}
                       </div>
                       <div>
@@ -1183,7 +1183,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
                   {/* Findings Breakdown Table */}
                   <div className="steep-card p-6 space-y-3">
-                    <h4 className="font-editorial text-xl font-bold text-ink">Statutory Compliance Findings & Required Amendments</h4>
+                    <h4 className="text-xl font-bold text-ink">Statutory Compliance Findings & Required Amendments</h4>
                     <div className="divide-y divide-mist">
                       {vendorReviewResult.findings.map((f: any, idx: number) => (
                         <div key={idx} className="py-4 space-y-2 text-xs">
@@ -1213,7 +1213,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           {advisorSubTab === 'chat' && (
             <div className="steep-card p-6 space-y-4">
               <div className="pb-3 border-b border-mist">
-                <h3 className="font-editorial text-2xl font-bold text-ink">
+                <h3 className="text-2xl font-bold text-ink">
                   Conversational CISO RAG Advisor
                 </h3>
                 <p className="text-xs text-slate mt-0.5">

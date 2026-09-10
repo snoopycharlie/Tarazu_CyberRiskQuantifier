@@ -97,7 +97,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
         <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
           Preferences
         </span>
-        <h1 className="font-editorial text-4xl font-bold text-ink tracking-tight">Settings</h1>
+        <h1 className="text-4xl font-bold text-ink tracking-tight">Settings</h1>
         <p className="text-slate text-base mt-1">
           Manage your profile, appearance, and application preferences.
         </p>
@@ -112,10 +112,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       )}
 
       {/* Profile */}
-      <section className="steep-card p-6 space-y-4">
+      <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <User className="w-4 h-4 text-sienna" />
-          <h2 className="font-editorial text-lg font-bold text-ink">Profile</h2>
+          <h2 className="text-lg font-bold text-ink">Profile</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -168,10 +168,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       </section>
 
       {/* Appearance */}
-      <section className="steep-card p-6 space-y-4">
+      <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <Palette className="w-4 h-4 text-sienna" />
-          <h2 className="font-editorial text-lg font-bold text-ink">Appearance</h2>
+          <h2 className="text-lg font-bold text-ink">Appearance</h2>
         </div>
 
         <div>
@@ -228,10 +228,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       </section>
 
       {/* Dashboard Preferences */}
-      <section className="steep-card p-6 space-y-4">
+      <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <LayoutDashboard className="w-4 h-4 text-sienna" />
-          <h2 className="font-editorial text-lg font-bold text-ink">Dashboard</h2>
+          <h2 className="text-lg font-bold text-ink">Dashboard</h2>
         </div>
 
         <div>
@@ -253,10 +253,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       </section>
 
       {/* Notifications */}
-      <section className="steep-card p-6 space-y-4">
+      <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <Bell className="w-4 h-4 text-sienna" />
-          <h2 className="font-editorial text-lg font-bold text-ink">Notifications</h2>
+          <h2 className="text-lg font-bold text-ink">Notifications</h2>
         </div>
 
         <div className="space-y-3">
@@ -288,10 +288,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       </section>
 
       {/* Demo Utilities */}
-      <section className="steep-card p-6 space-y-4">
+      <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <Database className="w-4 h-4 text-sienna" />
-          <h2 className="font-editorial text-lg font-bold text-ink">Demo Utilities</h2>
+          <h2 className="text-lg font-bold text-ink">Demo Utilities</h2>
         </div>
 
         <div className="p-3 rounded-xl bg-peach/30 border border-sienna/20 flex items-start gap-2">
@@ -312,10 +312,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       </section>
 
       {/* Session & Security */}
-      <section className="steep-card p-6 space-y-4">
+      <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <Shield className="w-4 h-4 text-sienna" />
-          <h2 className="font-editorial text-lg font-bold text-ink">Session & Security</h2>
+          <h2 className="text-lg font-bold text-ink">Session & Security</h2>
         </div>
 
         <div className="space-y-3 text-sm">

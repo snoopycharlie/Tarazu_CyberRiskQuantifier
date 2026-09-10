@@ -99,7 +99,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
           <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
             Scenario Analysis
           </span>
-          <h1 className="font-editorial text-4xl md:text-5xl font-bold text-ink tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
             What-If Analysis
           </h1>
           <p className="text-slate text-base mt-1 max-w-2xl">
@@ -163,7 +163,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
               <span className="text-xs font-bold text-sienna uppercase tracking-wider">
                 {loadingWhatIf ? 'Recalculating…' : 'Scenario Result'}
               </span>
-              <h2 className="font-editorial text-3xl font-bold text-sienna mt-1">
+              <h2 className="text-3xl font-bold text-sienna mt-1">
                 {whatIfResult.delta_inr >= 0
                   ? `Save ${formatInr(whatIfResult.delta_inr)}`
                   : `Additional exposure of ${formatInr(Math.abs(whatIfResult.delta_inr))}`}
@@ -177,7 +177,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-[11px] uppercase font-bold text-sienna/70 block">Before</div>
-                <div className="font-editorial text-xl font-bold text-ink">
+                <div className="text-xl font-bold text-ink">
                   {formatInr(whatIfResult.original_eal_inr)}
                 </div>
                 <div className="text-[11px] text-sienna/70">Current Exposure</div>
@@ -187,7 +187,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
               </div>
               <div>
                 <div className="text-[11px] uppercase font-bold text-sienna/70 block">After</div>
-                <div className={`font-editorial text-xl font-bold ${whatIfResult.delta_inr >= 0 ? 'text-emerald' : 'text-crimson'}`}>
+                <div className={`text-xl font-bold ${whatIfResult.delta_inr >= 0 ? 'text-emerald' : 'text-crimson'}`}>
                   {formatInr(whatIfResult.new_eal_inr)}
                 </div>
                 <div className="text-[11px] text-sienna/70">With Changes</div>
@@ -200,7 +200,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
       {/* Controls — Missing / Partial Controls (most useful for What-If) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-editorial text-2xl font-bold text-ink">Security Controls</h2>
+          <h2 className="text-2xl font-bold text-ink">Security Controls</h2>
           <p className="text-xs text-slate">Click any control to toggle it on or off</p>
         </div>
 
