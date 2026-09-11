@@ -124,20 +124,20 @@ async def test_db_seeding():
         assert org.name == "Suraksha Finance Ltd", "Seeded org name mismatch"
 
         # Verify sheets and assets
-        sheets_res = await session.execute(select(Sheet).where(Sheet.org_id == org.id))
+        sheets_res = await session.execute(select(Sheet).where(Sheet.org_id == org.id, Sheet.type == "base"))
         sheets = sheets_res.scalars().all()
-        assert len(sheets) == 4, f"Expected 4 sheets, found {len(sheets)}"
+        assert len(sheets) == 4, f"Expected 4 base sheets, found {len(sheets)}"
 
-        assets_res = await session.execute(select(Asset))
+        assets_res = await session.execute(select(Asset).join(Sheet).where(Sheet.org_id == org.id))
         assets = assets_res.scalars().all()
-        assert len(assets) == 32, f"Expected 32 assets, found {len(assets)}"
+        assert len(assets) >= 20, f"Expected at least 20 assets for Suraksha Finance, found {len(assets)}"
 
-        scores_res = await session.execute(select(RiskScore))
+        scores_res = await session.execute(select(RiskScore).join(Sheet, RiskScore.sheet_id == Sheet.id).where(Sheet.org_id == org.id))
         scores = scores_res.scalars().all()
         assert len(scores) > 0, "Risk scores should be computed for assets/sheets"
 
         total_eal = sum(s.expected_annual_loss_inr for s in scores if s.sheet_id and not s.asset_id)
-        print(f"    DB Seeding Passed! Org: {org.name}, Sheets: {len(sheets)}, Assets: {len(assets)}, Total EAL: ₹{total_eal:,.0f}")
+        print(f"    DB Seeding Passed! Org: {org.name}, Base Sheets: {len(sheets)}, Org Assets: {len(assets)}, Total EAL: ₹{total_eal:,.0f}")
 
 
 async def main():

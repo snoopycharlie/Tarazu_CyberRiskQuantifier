@@ -4,6 +4,7 @@ import { Sheet, Asset, CorrelationResult } from '../../types';
 import { api } from '../../services/api';
 import { RuleTraceModal } from '../common/RuleTraceModal';
 import { formatInr } from '../../utils/format';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface SheetsViewProps {
   sheets: Sheet[];
@@ -22,6 +23,7 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
 }) => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loadingAssets, setLoadingAssets] = useState(false);
+  const { t } = useLanguage();
 
   // Trace Modal state
   const [activeTraceAsset, setActiveTraceAsset] = useState<Asset | null>(null);
@@ -102,14 +104,13 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-bold text-slate uppercase tracking-widest block mb-2">
-            Infrastructure Inventory
+            {t('sheets.title')}
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
-            Assets & Infrastructure
+            {t('sheets.title')}
           </h1>
           <p className="text-slate text-base mt-3 max-w-2xl leading-relaxed">
-            Review your systems and vulnerabilities, and see the estimated financial impact each one creates.
-            Combine segments to analyze how risk compounds across connected systems.
+            {t('sheets.subtitle')}
           </p>
         </div>
 
@@ -119,14 +120,14 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
             className="px-4 py-2 rounded-lg bg-surface hover:bg-surface-2 border border-border-dim text-ink text-sm font-semibold transition-all flex items-center gap-2 shadow-sm"
           >
             <Layers className="w-4 h-4 text-cyber-blue" />
-            <span>Create Combined View</span>
+            <span>{t('sheets.createCombined')}</span>
           </button>
           <button
             onClick={onOpenIntakeModal}
             className="btn-primary"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Asset</span>
+            <span>{t('sheets.addAsset')}</span>
           </button>
         </div>
       </div>
@@ -149,7 +150,7 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
               <span>{sheet.name}</span>
               {sheet.type === 'combined' && (
                 <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${isActive ? 'bg-cyber-blue/20 text-cyber-blue' : 'bg-mist text-slate'}`}>
-                  Combined
+                  {t('sheets.combined')}
                 </span>
               )}
               {sheet.latest_eal_inr !== undefined && sheet.latest_eal_inr > 0 && (
@@ -168,15 +169,15 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-risk-high/20 text-risk-high">
-                Combined Risk Analysis
+                {t('sheets.crossSegment')}
               </span>
               <span className="text-sm font-medium text-ink">
-                {correlationResult.cross_edge_count} cross-segment connection{correlationResult.cross_edge_count !== 1 ? 's' : ''} found
+                {correlationResult.cross_edge_count} {correlationResult.cross_edge_count !== 1 ? t('sheets.connectionPlural') : t('sheets.connections')}
               </span>
             </div>
             {correlationResult.adjustment_pct !== 0 && (
               <span className="text-sm font-bold px-3 py-1 rounded-full bg-risk-high text-white shadow-sm">
-                +{correlationResult.adjustment_pct}% additional risk from connections
+                +{correlationResult.adjustment_pct}{t('sheets.addRisk')}
               </span>
             )}
           </div>
@@ -241,13 +242,13 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
         {loadingAssets ? (
           <div className="py-24 text-center">
             <div className="w-8 h-8 border-4 border-cyber-blue/20 border-t-cyber-blue rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-slate text-sm font-medium">Loading your infrastructure…</p>
+            <p className="text-slate text-sm font-medium">{t('general.loading')}</p>
           </div>
         ) : assets.length === 0 ? (
           <div className="py-24 text-center text-slate text-sm bg-surface-2 rounded-xl border border-dashed border-border-strong">
-            <p className="font-semibold text-ink text-base">No systems registered yet.</p>
+            <p className="font-semibold text-ink text-base">{t('sheets.noAssets')}</p>
             <p className="text-sm mt-2 text-slate">
-              Click <strong className="text-ink">"Add Asset"</strong> above to register a system or device to this segment.
+              {t('sheets.addFirst')}
             </p>
           </div>
         ) : (
@@ -255,13 +256,13 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
             <table className="w-full text-left text-sm border-collapse">
               <thead>
                 <tr className="border-b-2 border-border-dim text-slate uppercase text-xs tracking-wider">
-                  <th className="py-4 px-4 font-bold">System Name</th>
-                  <th className="py-4 px-4 font-bold">Type</th>
-                  <th className="py-4 px-4 font-bold">Criticality</th>
+                  <th className="py-4 px-4 font-bold">{t('sheets.col.system')}</th>
+                  <th className="py-4 px-4 font-bold">{t('sheets.col.type')}</th>
+                  <th className="py-4 px-4 font-bold">{t('sheets.col.criticality')}</th>
                   <th className="py-4 px-4 font-bold">Business Dependency</th>
-                  <th className="py-4 px-4 font-bold">Known Vulnerabilities</th>
-                  <th className="py-4 px-4 text-right font-bold">Est. Annual Exposure</th>
-                  <th className="py-4 px-4 text-right font-bold">Calculation</th>
+                  <th className="py-4 px-4 font-bold">{t('sheets.col.weaknesses')}</th>
+                  <th className="py-4 px-4 text-right font-bold">{t('sheets.col.exposure')}</th>
+                  <th className="py-4 px-4 text-right font-bold">{t('sheets.col.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-dim">
@@ -323,7 +324,7 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
                             className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-2 border border-border-dim text-ink text-xs font-semibold transition-all inline-flex items-center gap-1.5 shadow-sm"
                           >
                             <Eye className="w-3.5 h-3.5 text-cyber-blue" />
-                            <span>See Calculation</span>
+                            <span>{t('sheets.viewTrace')}</span>
                           </button>
                         ) : (
                           <span className="text-xs text-slate">—</span>

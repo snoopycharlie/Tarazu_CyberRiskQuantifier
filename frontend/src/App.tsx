@@ -6,7 +6,8 @@ import { Navbar } from './components/common/Navbar';
 import { LoginPage } from './components/common/LoginPage';
 import { DemoGuide } from './components/common/DemoGuide';
 import { getSession, DemoUser } from './utils/auth';
-import { loadSettings } from './components/common/SettingsView';
+import { loadSettings } from './utils/settings';
+import { LanguageProvider } from './i18n/LanguageContext';
 
 // Lazy-loaded views
 const DashboardView = lazy(() =>
@@ -179,6 +180,7 @@ export const App: React.FC = () => {
   }
 
   return (
+    <LanguageProvider>
     <div className="min-h-screen flex flex-col font-sans bg-fog text-ink">
       {/* Top Navigation */}
       <Navbar
@@ -331,5 +333,6 @@ export const App: React.FC = () => {
         )}
       </Suspense>
     </div>
+    </LanguageProvider>
   );
 };

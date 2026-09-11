@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .auth import require_api_key
 from .database import init_db, AsyncSessionLocal
-from .services.seed_data import seed_demo_org
+from .services.seed_data import seed_demo_org, seed_healthcare_org
 from .api import (
     organizations,
     sheets,
@@ -43,10 +43,11 @@ async def lifespan(app: FastAPI):
     await init_db()
     logger.info("Database schema verified.")
 
-    # Seed demo organization "Suraksha Finance Ltd" if not already present
+    # Seed demo organizations if not already present
     try:
         async with AsyncSessionLocal() as session:
             await seed_demo_org(session)
+            await seed_healthcare_org(session)
             await session.commit()
             logger.info("Demo organization verification completed.")
     except Exception as exc:
@@ -87,6 +88,7 @@ app.include_router(risk.router, dependencies=protected)
 app.include_router(modules.router, dependencies=protected)
 
 
+@app.get("/health", tags=["System"])
 @app.get("/api/health", tags=["System"])
 async def health_check():
     """Health check endpoint confirming API status, DB mode, and Groq AI availability."""

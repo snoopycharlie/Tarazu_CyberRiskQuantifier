@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import {
   Building2, FileText, PlusCircle, Scale, Settings, LogOut, ChevronDown,
   LayoutDashboard, BarChart3, Network, Layers, Brain, GitBranch, Shield, Wrench, User,
-  AlertTriangle,
+  AlertTriangle, Languages,
 } from 'lucide-react';
 import { Organization } from '../../types';
 import { DemoGuideButton } from './DemoGuide';
 import { formatInrCompact } from '../../utils/format';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface NavbarProps {
   currentOrg: Organization | null;
@@ -23,24 +24,6 @@ interface NavbarProps {
   onStartDemoGuide: () => void;
   onLogout: () => void;
 }
-
-interface NavTab {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  group: string;
-}
-
-const NAV_TABS: NavTab[] = [
-  { id: 'dashboard', label: 'Dashboard',         icon: LayoutDashboard, group: 'overview' },
-  { id: 'pillar1',   label: 'Risk by Size',       icon: BarChart3,       group: 'analyze' },
-  { id: 'pillar2',   label: 'Risk Spread',         icon: Network,         group: 'analyze' },
-  { id: 'sheets',    label: 'Assets',             icon: Layers,          group: 'analyze' },
-  { id: 'pillar3',   label: 'Advisor',            icon: Brain,           group: 'action' },
-  { id: 'whatif',    label: 'What-If',            icon: GitBranch,       group: 'action' },
-  { id: 'compliance',label: 'Compliance',         icon: Shield,          group: 'govern' },
-  { id: 'modules',   label: 'Tools',              icon: Wrench,          group: 'govern' },
-];
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentOrg,
@@ -58,6 +41,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showOrgMenu, setShowOrgMenu] = useState(false);
+  const { lang, setLang, t } = useLanguage();
+
+  const NAV_TABS = [
+    { id: 'dashboard', label: t('nav.tab.dashboard'), icon: LayoutDashboard, group: 'overview' },
+    { id: 'pillar1',   label: t('nav.tab.pillar1'),   icon: BarChart3,       group: 'analyze' },
+    { id: 'pillar2',   label: t('nav.tab.pillar2'),   icon: Network,         group: 'analyze' },
+    { id: 'sheets',    label: t('nav.tab.sheets'),    icon: Layers,          group: 'analyze' },
+    { id: 'pillar3',   label: t('nav.tab.pillar3'),   icon: Brain,           group: 'action'  },
+    { id: 'whatif',    label: t('nav.tab.whatif'),    icon: GitBranch,       group: 'action'  },
+    { id: 'compliance',label: t('nav.tab.compliance'),icon: Shield,          group: 'govern'  },
+    { id: 'modules',   label: t('nav.tab.modules'),   icon: Wrench,          group: 'govern'  },
+  ];
 
   return (
     <header className="sticky top-0 z-40 bg-page/90 backdrop-blur-md border-b border-border-dim shadow-sm">
@@ -85,20 +80,35 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
 
             {/* Financial Exposure Badge */}
             {totalEal > 0 && (
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-risk-critical-bg border border-risk-critical-border text-sm">
                 <AlertTriangle className="w-4 h-4 text-risk-critical" />
-                <span className="text-slate font-medium">Exposure:</span>
+                <span className="text-slate font-medium">{t('nav.exposure')}:</span>
                 <span className="font-bold text-risk-critical">
                   {formatInrCompact(totalEal)}
                 </span>
               </div>
             )}
 
-            {/* Demo Guide */}
+            {/* Language Toggle */}
+            <button
+              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all"
+              style={{
+                background: lang === 'hi' ? 'rgba(59,130,246,0.1)' : 'transparent',
+                borderColor: lang === 'hi' ? 'rgba(59,130,246,0.3)' : 'var(--border-dim)',
+                color: lang === 'hi' ? 'var(--cyber-blue)' : 'var(--slate)',
+              }}
+              title={lang === 'en' ? 'हिंदी में बदलें' : 'Switch to English'}
+            >
+              <Languages className="w-3.5 h-3.5" />
+              <span>{lang === 'en' ? 'हिं' : 'EN'}</span>
+            </button>
+
+            {/* Tutorial Button */}
             <DemoGuideButton onClick={onStartDemoGuide} />
 
             {/* Organization selector */}
@@ -109,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Building2 className="w-4 h-4 text-cyber-blue" />
                 <span className="max-w-[140px] truncate hidden sm:block">
-                  {currentOrg?.name || 'Select Org'}
+                  {currentOrg?.name || t('nav.selectOrg')}
                 </span>
                 <ChevronDown className="w-4 h-4 text-slate" />
               </button>
@@ -127,8 +137,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                           key={org.id}
                           onClick={() => { onSelectOrg(org); setShowOrgMenu(false); }}
                           className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all ${
-                            currentOrg?.id === org.id 
-                              ? 'bg-cyber-blue/10 text-cyber-blue' 
+                            currentOrg?.id === org.id
+                              ? 'bg-cyber-blue/10 text-cyber-blue'
                               : 'text-ink hover:bg-surface-2'
                           }`}
                         >
@@ -145,7 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-slate hover:text-cyber-blue hover:bg-surface-2 transition-all"
                         >
                           <PlusCircle className="w-4 h-4" />
-                          <span className="font-medium">Add Organization</span>
+                          <span className="font-medium">{t('nav.addOrg')}</span>
                         </button>
                       </div>
                     </div>
@@ -160,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-cyber-blue/10 border border-cyber-blue/20 text-cyber-blue hover:bg-cyber-blue/20 hover:border-cyber-blue/40 transition-all"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Add Asset</span>
+              <span>{t('nav.addAsset')}</span>
             </button>
 
             {/* Audit Report */}
@@ -169,7 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-surface hover:bg-surface-2 border border-border-dim text-ink transition-all"
             >
               <FileText className="w-4 h-4 text-slate" />
-              <span className="hidden sm:inline">Report</span>
+              <span className="hidden sm:inline">{t('nav.report')}</span>
             </button>
 
             {/* User menu */}
@@ -195,7 +205,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-ink hover:bg-surface-2 transition-all font-medium"
                       >
                         <Settings className="w-4 h-4 text-slate" />
-                        <span>Settings</span>
+                        <span>{t('nav.settings')}</span>
                       </button>
                       <div className="my-1 border-t border-border-dim" />
                       <button
@@ -203,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-risk-critical hover:bg-risk-critical-bg transition-all font-medium"
                       >
                         <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
+                        <span>{t('nav.signOut')}</span>
                       </button>
                     </div>
                   </div>

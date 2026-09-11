@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -10,21 +10,19 @@ import {
   Handle,
   Position,
   NodeProps,
-  EdgeProps,
-  getBezierPath,
-  BaseEdge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Network, Plus, Zap, RefreshCw, X, Info, AlertTriangle, Shield,
-  Server, Laptop, Database, Lock, Globe, HardDrive, Cpu, Radio, Router, Mail, Video
+  Network, RefreshCw, X, Info, AlertTriangle, Shield,
+  Server, Laptop, Database, Lock, Globe, HardDrive, Cpu, Router, Mail, Video,
 } from 'lucide-react';
 
 import { Sheet, BlastRadiusResult, GraphData } from '../../types';
 import { api } from '../../services/api';
 import { formatInr } from '../../utils/format';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface Pillar2GraphViewProps {
   sheets: Sheet[];
@@ -73,13 +71,29 @@ const AssetNode = ({ data, selected }: NodeProps) => {
     borderColor = 'border-risk-high';
   }
 
+  const showWarning = (risk === 'critical' || risk === 'high') && !isDimmed;
+
   return (
     <div
       className={`relative flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-300 shadow-sm ${bgColor} ${borderColor} ${selected ? 'shadow-elevated scale-105' : ''} ${isDimmed ? 'opacity-20' : 'opacity-100'}`}
-      style={{ minWidth: 220 }}
+      style={{ minWidth: 230 }}
     >
       <Handle type="target" position={Position.Top} className="!opacity-0" />
-      <div className={`p-2 rounded-lg bg-surface-2 ${iconColor}`}>
+
+      {/* Warning badge — restored */}
+      {showWarning && (
+        <div
+          className="absolute -top-2.5 -right-2.5 w-5 h-5 rounded-full flex items-center justify-center shadow-md z-10"
+          style={{
+            background: risk === 'critical' ? 'var(--risk-critical)' : 'var(--risk-high)',
+          }}
+          title={`${risk === 'critical' ? 'Critical' : 'High'} risk system`}
+        >
+          <AlertTriangle className="w-3 h-3 text-white" />
+        </div>
+      )}
+
+      <div className={`p-2 rounded-lg bg-surface-2 ${iconColor} shrink-0`}>
         <Icon className="w-5 h-5" />
       </div>
       <div className="flex-1 min-w-0">
@@ -95,33 +109,34 @@ const AssetNode = ({ data, selected }: NodeProps) => {
 
 const nodeTypes = { asset: AssetNode };
 
-// ── Layout calculation (Dagre) ───────────────────────────────────────────────
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
+// ── Layout calculation (Dagre) — increased spacing to prevent overlap ────────
 const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
   const isHorizontal = direction === 'LR';
-  dagreGraph.setGraph({ rankdir: direction, ranksep: 80, nodesep: 40 });
+
+  // Create a fresh graph each time to avoid stale state
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: direction, ranksep: 110, nodesep: 60, marginx: 30, marginy: 30 });
 
   nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: 220, height: 70 });
+    g.setNode(node.id, { width: 240, height: 80 });
   });
 
   edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
+    g.setEdge(edge.source, edge.target);
   });
 
-  dagre.layout(dagreGraph);
+  dagre.layout(g);
 
   const layoutedNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
+    const nodeWithPosition = g.node(node.id);
     return {
       ...node,
       targetPosition: isHorizontal ? 'left' : 'top',
       sourcePosition: isHorizontal ? 'right' : 'bottom',
       position: {
-        x: nodeWithPosition.x - 220 / 2,
-        y: nodeWithPosition.y - 70 / 2,
+        x: nodeWithPosition.x - 240 / 2,
+        y: nodeWithPosition.y - 80 / 2,
       },
     };
   });
@@ -137,12 +152,13 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
 }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  
+
   const [loading, setLoading] = useState(false);
   const [selectedNode, setSelectedNode] = useState<any | null>(null);
   const [blastResult, setBlastResult] = useState<BlastRadiusResult | null>(null);
   const [calculatingBlast, setCalculatingBlast] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const { t } = useLanguage();
 
   // Load graph
   useEffect(() => {
@@ -154,8 +170,8 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
       setLoading(true);
       setSelectedNode(null);
       setBlastResult(null);
-      const data = await api.getGraph(sheetId);
-      
+      const data: GraphData = await api.getGraph(sheetId);
+
       const rawNodes = data.elements
         .filter((el) => el.group === 'nodes')
         .map((el) => ({
@@ -233,7 +249,7 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
     }
   };
 
-  const handleNodeClick = useCallback((_, node) => {
+  const handleNodeClick = useCallback((_: any, node: any) => {
     setSelectedNode(node.data);
     triggerBlastRadius(node.id);
   }, [activeSheetId]);
@@ -250,7 +266,6 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
     })));
   }, [setNodes, setEdges]);
 
-  // Risk Color map for details panel
   const getRiskColor = (level: string) => {
     switch (level) {
       case 'critical': return 'var(--risk-critical)';
@@ -262,7 +277,7 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
@@ -277,16 +292,16 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
               Network Analysis
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-ink">How Risk Can Spread</h1>
+          <h1 className="text-3xl font-bold text-ink">{t('spread.title')}</h1>
           <p className="text-slate mt-2 max-w-2xl text-sm">
-            A vulnerability in one system cascades through connections. 
-            <strong className="text-ink font-semibold ml-1">Click any system</strong> to map its downstream impact.
+            {t('spread.subtitle')}
+            <strong className="text-ink font-semibold ml-1">{t('spread.subtitle2')}</strong>
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => setShowHelp(!showHelp)} className="btn-secondary">
             <Info className="w-4 h-4" />
-            How to Use
+            {t('spread.howToUse')}
           </button>
         </div>
       </div>
@@ -301,19 +316,19 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
           >
             <div className="tarazu-card p-6 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-bold text-ink mb-3">Reading the Map</h3>
+                <h3 className="font-bold text-ink mb-3">{t('spread.guide.readMap')}</h3>
                 <ul className="text-sm text-slate space-y-2">
-                  <li>• <strong className="text-ink">Red nodes</strong>: Initial compromised system</li>
-                  <li>• <strong className="text-ink">Highlighted paths</strong>: Route an attacker could take</li>
-                  <li>• <strong className="text-ink">Dimmed nodes</strong>: Systems safe from this specific breach</li>
+                  <li>{t('spread.guide.redNodes')}</li>
+                  <li>{t('spread.guide.highlighted')}</li>
+                  <li>{t('spread.guide.dimmed')}</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-bold text-ink mb-3">Risk Severity Borders</h3>
+                <h3 className="font-bold text-ink mb-3">{t('spread.guide.borders')}</h3>
                 <div className="flex items-center gap-4 text-sm font-semibold">
-                  <span className="text-risk-critical">Red = Critical</span>
-                  <span className="text-risk-high">Amber = High</span>
-                  <span className="text-risk-medium">Blue = Moderate</span>
+                  <span className="text-risk-critical">{t('spread.guide.critical')}</span>
+                  <span className="text-risk-high">{t('spread.guide.high')}</span>
+                  <span className="text-risk-medium">{t('spread.guide.medium')}</span>
                 </div>
               </div>
             </div>
@@ -352,10 +367,10 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold text-ink">
-                Exposure: <span className="text-risk-critical">{formatInr(blastResult.total_downstream_exposure_inr)}</span>
+                {t('spread.alert.exposure')} <span className="text-risk-critical">{formatInr(blastResult.total_downstream_exposure_inr)}</span>
               </h3>
               <p className="text-sm text-slate mt-1">
-                If <strong className="text-risk-critical">{blastResult.origin_asset_name}</strong> is breached, risk spreads to {blastResult.reachable_asset_ids.length} downstream systems.
+                {t('spread.alert.desc')} <strong className="text-risk-critical">{blastResult.origin_asset_name}</strong> {t('spread.alert.desc2')} {blastResult.reachable_asset_ids.length} {t('spread.alert.desc3')}
               </p>
             </div>
           </motion.div>
@@ -378,6 +393,7 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
           onPaneClick={handlePaneClick}
           nodeTypes={nodeTypes}
           fitView
+          fitViewOptions={{ padding: 0.2 }}
           attributionPosition="bottom-right"
           className="bg-page"
         >
@@ -411,14 +427,14 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
               </div>
               <div className="p-5 space-y-4">
                 <div className="p-4 bg-surface-2 rounded-lg border border-border-dim">
-                  <div className="text-xs font-semibold text-slate mb-1">Financial Exposure</div>
+                  <div className="text-xs font-semibold text-slate mb-1">{t('spread.panel.exposure')}</div>
                   <div className="text-2xl font-bold text-ink">{formatInr(selectedNode.eal_inr || 0)}</div>
-                  <div className="text-xs text-slate mt-1">{selectedNode.revenue_dependency_pct}% revenue dependency</div>
+                  <div className="text-xs text-slate mt-1">{selectedNode.revenue_dependency_pct}{t('spread.panel.revDep')}</div>
                 </div>
-                
+
                 {selectedNode.cves && selectedNode.cves.length > 0 && (
                   <div>
-                    <div className="text-xs font-semibold text-slate mb-2">Known CVEs</div>
+                    <div className="text-xs font-semibold text-slate mb-2">{t('spread.panel.weaknesses')}</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedNode.cves.map((cve: string) => (
                         <span key={cve} className="text-[10px] font-mono font-bold px-2 py-1 bg-risk-critical/10 text-risk-critical rounded">

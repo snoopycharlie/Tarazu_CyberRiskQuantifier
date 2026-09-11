@@ -5,11 +5,13 @@ import {
 import { DemoComparison } from '../../types';
 import { api } from '../../services/api';
 import { formatInr } from '../../utils/format';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 export const Pillar1ComparisonView: React.FC = () => {
   const [data, setData] = useState<DemoComparison | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTrace, setShowTrace] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadComparison();
@@ -31,7 +33,7 @@ export const Pillar1ComparisonView: React.FC = () => {
     return (
       <div className="py-32 text-center">
         <div className="w-10 h-10 border-4 border-cyber-blue/20 border-t-cyber-blue rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate font-medium">Comparing risk across organizations…</p>
+        <p className="text-slate font-medium">{t('pillar1.loading')}</p>
         <p className="text-smoke text-xs mt-1">Running business context analysis</p>
       </div>
     );
@@ -42,16 +44,15 @@ export const Pillar1ComparisonView: React.FC = () => {
       {/* Page Header */}
       <div>
         <span className="text-xs font-bold text-slate uppercase tracking-widest block mb-2">
-          Why Context Matters
+          {t('pillar1.tag')}
         </span>
         <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
-          Risk Changes With Business Size
+          {t('pillar1.title')}
         </h1>
         <p className="text-slate text-base mt-3 max-w-3xl">
-          Traditional security scanners label the same vulnerability as{' '}
-          <span className="font-bold text-risk-critical">"Critical"</span> for everyone.
-          Tarazu goes further — it calculates the actual financial exposure based on your{' '}
-          <strong className="text-ink">organization's size, revenue, and regulatory context</strong>.
+          {t('pillar1.desc1')}{' '}
+          <span className="font-bold text-risk-critical">{t('pillar1.criticalTag')}</span>{' '}
+          {t('pillar1.desc2')}
         </p>
       </div>
 
@@ -78,9 +79,9 @@ export const Pillar1ComparisonView: React.FC = () => {
             </div>
           </div>
           <div className="text-right whitespace-nowrap">
-            <span className="text-xs text-slate block uppercase tracking-wider font-semibold">Same Vulnerability</span>
+            <span className="text-xs text-slate block uppercase tracking-wider font-semibold">{t('pillar1.sameVuln')}</span>
             <span className="text-xs font-semibold text-risk-low bg-risk-low-bg border border-risk-low-border px-3 py-1 rounded-full inline-block mt-2">
-              Applied to Both Organizations
+              {t('pillar1.bothOrgs')}
             </span>
           </div>
         </div>

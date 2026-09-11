@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Search, ShieldAlert, Cpu, Sparkles, Check } from 'lucide-react';
+import { X, Search, ShieldAlert, Sparkles, Check } from 'lucide-react';
 import { Sheet, CVEMatch } from '../../types';
 import { api } from '../../services/api';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface AssetIntakeModalProps {
   isOpen: boolean;
@@ -18,18 +19,19 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
   currentSheetId,
   onAssetCreated,
 }) => {
+  const { t } = useLanguage();
   const [sheetId, setSheetId] = useState(currentSheetId || (sheets[0]?.id || ''));
   const [name, setName] = useState('');
   const [assetType, setAssetType] = useState('Server');
   const [criticalityTag, setCriticalityTag] = useState('standard');
   const [revenueDependency, setRevenueDependency] = useState(15.0);
 
-  // Vulnerability & CVE lookup state
-  const [cveSearchQuery, setCveSearchQuery] = useState('');
-  const [cveMatches, setCveMatches] = useState<CVEMatch[]>([]);
-  const [searchingCve, setSearchingCve] = useState(false);
+  // Weakness search state
+  const [weaknessQuery, setWeaknessQuery] = useState('');
+  const [weaknessMatches, setWeaknessMatches] = useState<CVEMatch[]>([]);
+  const [searchingWeakness, setSearchingWeakness] = useState(false);
 
-  // Selected vuln
+  // Selected weakness
   const [cveId, setCveId] = useState('');
   const [cvssScore, setCvssScore] = useState<number | ''>('');
   const [vulnDesc, setVulnDesc] = useState('');
@@ -39,24 +41,24 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleCveSearch = async () => {
-    if (!cveSearchQuery.trim()) return;
+  const handleWeaknessSearch = async () => {
+    if (!weaknessQuery.trim()) return;
     try {
-      setSearchingCve(true);
-      const results = await api.searchCve(cveSearchQuery.trim());
-      setCveMatches(results);
+      setSearchingWeakness(true);
+      const results = await api.searchCve(weaknessQuery.trim());
+      setWeaknessMatches(results);
     } catch (err) {
-      console.error('CVE search failed:', err);
+      console.error('Weakness search failed:', err);
     } finally {
-      setSearchingCve(false);
+      setSearchingWeakness(false);
     }
   };
 
-  const handleSelectCve = (match: CVEMatch) => {
+  const handleSelectWeakness = (match: CVEMatch) => {
     setCveId(match.cve_id);
     setCvssScore(match.cvss_score || '');
     setVulnDesc(match.description);
-    setCveMatches([]);
+    setWeaknessMatches([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,7 +82,7 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
       onAssetCreated();
       onClose();
     } catch (err: any) {
-      alert(`Asset intake failed: ${err.message}`);
+      alert(`Could not add system: ${err.message}`);
     } finally {
       setSubmitting(false);
     }
@@ -94,11 +96,11 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-peach text-sienna tracking-wide">
-                GUIDED INTAKE
+                {t('intake.badge')}
               </span>
-              <span className="text-xs text-slate">NIST NVD Live Auto-Match</span>
+              <span className="text-xs text-slate">{t('intake.liveSearch')}</span>
             </div>
-            <h2 className="text-2xl font-bold text-ink mt-1">Register Monitored Asset</h2>
+            <h2 className="text-2xl font-bold text-ink mt-1">{t('intake.title')}</h2>
           </div>
           <button onClick={onClose} className="text-slate hover:text-ink p-1">
             <X className="w-5 h-5" />
@@ -106,10 +108,10 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-5 text-xs">
-          {/* Target Sheet & Name */}
+          {/* Sheet & Name */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="font-bold text-slate uppercase block mb-1">Target Infrastructure Sheet</label>
+              <label className="font-bold text-slate uppercase block mb-1">{t('intake.sheet')}</label>
               <select
                 value={sheetId}
                 onChange={(e) => setSheetId(e.target.value)}
@@ -118,16 +120,16 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
               >
                 {sheets.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({s.type})
+                    {s.name}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="font-bold text-slate uppercase block mb-1">Asset Name</label>
+              <label className="font-bold text-slate uppercase block mb-1">{t('intake.name')}</label>
               <input
                 type="text"
-                placeholder="e.g. Core Oracle Transaction DB"
+                placeholder={t('intake.namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -136,10 +138,10 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
             </div>
           </div>
 
-          {/* Type & Criticality Tag */}
+          {/* Type & Criticality */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="font-bold text-slate uppercase block mb-1">Asset Category</label>
+              <label className="font-bold text-slate uppercase block mb-1">{t('intake.category')}</label>
               <select
                 value={assetType}
                 onChange={(e) => setAssetType(e.target.value)}
@@ -147,25 +149,25 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
               >
                 <option value="Server">Server</option>
                 <option value="Database">Database</option>
-                <option value="Workstation">Workstation</option>
+                <option value="Workstation">Workstation / Laptop</option>
                 <option value="Cloud Service">Cloud Service</option>
                 <option value="Network Device">Network Device</option>
                 <option value="Web App">Web Application</option>
               </select>
             </div>
             <div>
-              <label className="font-bold text-slate uppercase block mb-1">Business Criticality Tag</label>
+              <label className="font-bold text-slate uppercase block mb-1">{t('intake.criticality')}</label>
               <select
                 value={criticalityTag}
                 onChange={(e) => setCriticalityTag(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-mist bg-fog text-ink text-sm font-medium focus:outline-none"
               >
-                <option value="standard">Standard Internal Resource</option>
-                <option value="payment_processing">Payment Processing (NPCI/SWIFT/UPI)</option>
+                <option value="standard">Standard Internal System</option>
+                <option value="payment_processing">Payment Processing (NPCI / SWIFT / UPI)</option>
                 <option value="core_db">Core Customer Database</option>
                 <option value="customer_portal">Public Customer Web Portal</option>
                 <option value="admin_workstation">Privileged Admin Workstation</option>
-                <option value="backup_system">Backup / Disaster Recovery Node</option>
+                <option value="backup_system">Backup / Disaster Recovery</option>
               </select>
             </div>
           </div>
@@ -173,8 +175,8 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
           {/* Revenue Dependency Slider */}
           <div>
             <div className="flex justify-between mb-1">
-              <label className="font-bold text-slate uppercase">Revenue Dependency Exposure</label>
-              <span className="font-bold text-sienna text-sm">{revenueDependency}% Revenue Impact</span>
+              <label className="font-bold text-slate uppercase">{t('intake.revDep')}</label>
+              <span className="font-bold text-sienna text-sm">{revenueDependency}{t('intake.revDepVal')}</span>
             </div>
             <input
               type="range"
@@ -187,11 +189,14 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
             />
           </div>
 
-          {/* Live NIST NVD CVE Lookup Section */}
+          {/* Weakness Search Section */}
           <div className="p-4 rounded-2xl bg-fog border border-mist space-y-3">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate uppercase">Attach Known Vulnerability (Optional)</span>
-              <span className="text-[11px] text-slate">Live NIST NVD v2.0 API Lookup</span>
+              <span className="font-bold text-slate uppercase">{t('intake.weakness')}</span>
+              <span className="text-[11px] text-slate flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3" />
+                {t('intake.weaknessSearch')}
+              </span>
             </div>
 
             <div className="flex gap-2">
@@ -199,78 +204,78 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
                 <Search className="w-4 h-4 text-slate absolute left-3 top-3" />
                 <input
                   type="text"
-                  placeholder="Search software (e.g. Citrix, FortiOS, Log4j, Exchange, Apache)..."
-                  value={cveSearchQuery}
-                  onChange={(e) => setCveSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleCveSearch())}
+                  placeholder={t('intake.searchPlaceholder')}
+                  value={weaknessQuery}
+                  onChange={(e) => setWeaknessQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleWeaknessSearch())}
                   className="w-full pl-9 pr-3 py-2 rounded-xl border border-mist bg-white text-ink text-xs focus:outline-none"
                 />
               </div>
               <button
                 type="button"
-                onClick={handleCveSearch}
-                disabled={searchingCve || !cveSearchQuery.trim()}
+                onClick={handleWeaknessSearch}
+                disabled={searchingWeakness || !weaknessQuery.trim()}
                 className="px-4 py-2 rounded-xl bg-ink text-paper text-xs font-semibold hover:bg-black transition disabled:opacity-50"
               >
-                {searchingCve ? 'Searching...' : 'NVD Match'}
+                {searchingWeakness ? t('intake.searching') : t('intake.searchBtn')}
               </button>
             </div>
 
-            {/* Match Results dropdown */}
-            {cveMatches.length > 0 && (
+            {/* Search Results */}
+            {weaknessMatches.length > 0 && (
               <div className="p-2 bg-white rounded-xl border border-mist max-h-48 overflow-y-auto space-y-1.5">
-                {cveMatches.map((m) => (
+                {weaknessMatches.map((m) => (
                   <div
                     key={m.cve_id}
-                    onClick={() => handleSelectCve(m)}
+                    onClick={() => handleSelectWeakness(m)}
                     className="p-2 rounded-lg hover:bg-fog cursor-pointer transition flex items-start justify-between gap-2"
                   >
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-bold text-xs text-ink">{m.cve_id}</span>
                         {m.cvss_score && (
-                          <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                             m.cvss_score >= 9.0 ? 'bg-crimson/15 text-crimson' : 'bg-amber/15 text-amber'
                           }`}>
-                            CVSS {m.cvss_score}
+                            Severity {m.cvss_score}
                           </span>
                         )}
                       </div>
                       <p className="text-[11px] text-slate line-clamp-1 mt-0.5">{m.description}</p>
                     </div>
-                    <span className="text-[10px] font-semibold text-sienna shrink-0">Auto-fill</span>
+                    <span className="text-[10px] font-semibold text-sienna shrink-0">{t('intake.autofill')}</span>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Selected CVE Inputs */}
+            {/* Selected Weakness Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <div>
-                <label className="font-bold text-slate uppercase block mb-1">CVE Identifier</label>
+                <label className="font-bold text-slate uppercase block mb-1">{t('intake.weaknessId')}</label>
                 <input
                   type="text"
-                  placeholder="e.g. CVE-2023-4966"
+                  placeholder={t('intake.weaknessIdPlaceholder')}
                   value={cveId}
                   onChange={(e) => setCveId(e.target.value)}
                   className="w-full p-2 rounded-xl border border-mist bg-white text-ink text-xs font-mono font-semibold"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate uppercase block mb-1">CVSS Base Score (0-10)</label>
+                <label className="font-bold text-slate uppercase block mb-1">{t('intake.severity')}</label>
                 <input
                   type="number"
                   step="0.1"
                   min="0"
                   max="10"
-                  placeholder="e.g. 9.4"
+                  placeholder={t('intake.severityPlaceholder')}
                   value={cvssScore}
                   onChange={(e) => setCvssScore(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full p-2 rounded-xl border border-mist bg-white text-ink text-xs font-semibold"
                 />
               </div>
               <div>
-                <label className="font-bold text-slate uppercase block mb-1">Days Unpatched</label>
+                <label className="font-bold text-slate uppercase block mb-1">{t('intake.daysUnpatched')}</label>
                 <input
                   type="number"
                   min="0"
@@ -289,14 +294,14 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 rounded-pill bg-fog border border-mist text-slate hover:text-ink font-medium"
             >
-              Cancel
+              {t('intake.cancel')}
             </button>
             <button
               type="submit"
               disabled={submitting || !name.trim()}
               className="px-6 py-2 rounded-pill bg-ink text-paper font-semibold hover:bg-black transition disabled:opacity-50"
             >
-              {submitting ? 'Registering & Quantifying...' : 'Add Asset & Compute EAL'}
+              {submitting ? t('intake.submitting') : t('intake.submit')}
             </button>
           </div>
         </form>

@@ -3,6 +3,7 @@ import { Sliders, TrendingDown, TrendingUp, RefreshCw, Info, ChevronDown, Chevro
 import { Control, WhatIfResult, Organization } from '../../types';
 import { api } from '../../services/api';
 import { formatInr } from '../../utils/format';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface WhatIfViewProps {
   currentOrg: Organization | null;
@@ -15,6 +16,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
   const [loadingControls, setLoadingControls] = useState(false);
   const [loadingWhatIf, setLoadingWhatIf] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (currentOrg) {
@@ -77,7 +79,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
     return (
       <div className="py-24 text-center">
         <div className="w-10 h-10 border-4 border-sienna border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate font-medium">Loading security controls…</p>
+        <p className="text-slate font-medium">{t('general.loading')}</p>
       </div>
     );
   }
@@ -97,14 +99,13 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
-            Scenario Analysis
+            {t('whatif.tag')}
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
-            What-If Analysis
+            {t('whatif.title')}
           </h1>
           <p className="text-slate text-base mt-1 max-w-2xl">
-            Toggle security controls on or off to instantly see how your estimated financial exposure changes.
-            Use this to evaluate the impact of specific security investments before committing budget.
+            {t('whatif.subtitle')}
           </p>
         </div>
 
@@ -115,7 +116,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
               className="px-4 py-2.5 rounded-pill bg-fog border border-mist text-ink text-xs font-semibold hover:bg-mist transition flex items-center gap-1.5"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Reset to Current State</span>
+              <span>{t('whatif.reset')}</span>
             </button>
           )}
         </div>
@@ -129,7 +130,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
         >
           <div className="flex items-center gap-2">
             <Info className="w-4 h-4 text-sienna" />
-            <span className="text-sm font-semibold text-ink">How does this work?</span>
+            <span className="text-sm font-semibold text-ink">{t('whatif.howWorks')}</span>
           </div>
           {showHowItWorks ? (
             <ChevronUp className="w-4 h-4 text-slate" />
@@ -161,12 +162,12 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <span className="text-xs font-bold text-sienna uppercase tracking-wider">
-                {loadingWhatIf ? 'Recalculating…' : 'Scenario Result'}
+                {loadingWhatIf ? t('whatif.recalculating') : t('whatif.result')}
               </span>
               <h2 className="text-3xl font-bold text-sienna mt-1">
                 {whatIfResult.delta_inr >= 0
-                  ? `Save ${formatInr(whatIfResult.delta_inr)}`
-                  : `Additional exposure of ${formatInr(Math.abs(whatIfResult.delta_inr))}`}
+                  ? `${t('whatif.save')} ${formatInr(whatIfResult.delta_inr)}`
+                  : `${t('whatif.moreExposure')} ${formatInr(Math.abs(whatIfResult.delta_inr))}`}
               </h2>
               <p className="text-xs text-sienna/80 mt-1">
                 {whatIfResult.delta_inr >= 0
@@ -176,21 +177,21 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
             </div>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-[11px] uppercase font-bold text-sienna/70 block">Before</div>
+                <div className="text-[11px] uppercase font-bold text-sienna/70 block">{t('whatif.before')}</div>
                 <div className="text-xl font-bold text-ink">
                   {formatInr(whatIfResult.original_eal_inr)}
                 </div>
-                <div className="text-[11px] text-sienna/70">Current Exposure</div>
+                <div className="text-[11px] text-sienna/70">{t('whatif.currentExposure')}</div>
               </div>
               <div className="flex items-center justify-center">
                 <ArrowRight className="w-5 h-5 text-sienna/50" />
               </div>
               <div>
-                <div className="text-[11px] uppercase font-bold text-sienna/70 block">After</div>
+                <div className="text-[11px] uppercase font-bold text-sienna/70 block">{t('whatif.after')}</div>
                 <div className={`text-xl font-bold ${whatIfResult.delta_inr >= 0 ? 'text-emerald' : 'text-crimson'}`}>
                   {formatInr(whatIfResult.new_eal_inr)}
                 </div>
-                <div className="text-[11px] text-sienna/70">With Changes</div>
+                <div className="text-[11px] text-sienna/70">{t('whatif.withChanges')}</div>
               </div>
             </div>
           </div>

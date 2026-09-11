@@ -2,59 +2,27 @@ import React, { useState, useEffect } from 'react';
 import {
   User, Mail, Building2, Palette, LayoutDashboard, Bell,
   Database, Shield, LogOut, ChevronRight, Check, Monitor,
-  Sun, Moon, RefreshCw, Info, Clock
+  Sun, Moon, RefreshCw, Info, Clock, Globe
 } from 'lucide-react';
 import { DemoUser, authLogout } from '../../utils/auth';
+import { useLanguage } from '../../i18n/LanguageContext';
+import {
+  AppSettings,
+  DEFAULT_SETTINGS,
+  SETTINGS_KEY,
+  loadSettings,
+  saveSettings,
+} from '../../utils/settings';
 
 interface SettingsViewProps {
   currentUser: DemoUser | null;
   onLogout: () => void;
 }
 
-type ThemeMode = 'light' | 'dark';
-type DensityMode = 'comfortable' | 'compact';
-
-const SETTINGS_KEY = 'tarazu_settings';
-
-interface AppSettings {
-  theme: ThemeMode;
-  density: DensityMode;
-  defaultPage: string;
-  defaultCurrency: 'INR';
-  riskAlerts: boolean;
-  complianceAlerts: boolean;
-  recommendationAlerts: boolean;
-  userName: string;
-}
-
-const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'light',
-  density: 'comfortable',
-  defaultPage: 'dashboard',
-  defaultCurrency: 'INR',
-  riskAlerts: true,
-  complianceAlerts: true,
-  recommendationAlerts: true,
-  userName: '',
-};
-
-export const loadSettings = (): AppSettings => {
-  try {
-    const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return DEFAULT_SETTINGS;
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-};
-
-const saveSettings = (s: AppSettings) => {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
-};
-
 export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogout }) => {
   const [settings, setSettings] = useState<AppSettings>(loadSettings);
   const [savedFlash, setSavedFlash] = useState(false);
+  const { lang, setLang, t } = useLanguage();
 
   const update = (partial: Partial<AppSettings>) => {
     const next = { ...settings, ...partial };
@@ -167,11 +135,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
         </div>
       </section>
 
-      {/* Appearance */}
+      {/* Appearance & Language */}
       <section className="tarazu-card p-6 space-y-4">
         <div className="flex items-center gap-2 pb-4 border-b border-mist">
           <Palette className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">Appearance</h2>
+          <h2 className="text-lg font-bold text-ink">{t('settings.appearance')}</h2>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-3">
+            {t('settings.language')}
+          </label>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setLang('en')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition ${
+                lang === 'en'
+                  ? 'bg-ink text-paper border-ink'
+                  : 'bg-fog border-mist text-slate hover:text-ink hover:border-slate/40'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>{t('settings.english')}</span>
+            </button>
+            <button
+              onClick={() => setLang('hi')}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition ${
+                lang === 'hi'
+                  ? 'bg-ink text-paper border-ink'
+                  : 'bg-fog border-mist text-slate hover:text-ink hover:border-slate/40'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>{t('settings.hindi')}</span>
+            </button>
+          </div>
         </div>
 
         <div>
@@ -180,8 +178,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
           </label>
           <div className="flex items-center gap-3">
             {([
-              { value: 'light', label: 'Light', icon: Sun },
-              { value: 'dark', label: 'Dark', icon: Moon },
+              { value: 'light', label: t('settings.light'), icon: Sun },
+              { value: 'dark', label: t('settings.dark'), icon: Moon },
             ] as const).map(({ value, label, icon: Icon }) => (
               <button
                 key={value}

@@ -5,7 +5,8 @@ import {
 } from 'recharts';
 import { OptimizeResult, Organization } from '../../types';
 import { api } from '../../services/api';
-import { formatInr, formatInrCompact } from '../../utils/format';
+import { formatInr } from '../../utils/format';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface Pillar3AdvisorViewProps {
   currentOrg: Organization | null;
@@ -16,6 +17,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
   const [optResult, setOptResult] = useState<OptimizeResult | null>(null);
   const [loadingOpt, setLoadingOpt] = useState(false);
   const [showHowCalculated, setShowHowCalculated] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (currentOrg) {
@@ -56,14 +58,13 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
       {/* Page Header */}
       <div>
         <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
-          Security Investment Planning
+          {t('advisor.title')}
         </span>
         <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
-          Investment Advisor
+          {t('advisor.title')}
         </h1>
         <p className="text-slate text-base mt-2 max-w-3xl">
-          With limited security budget, where should you spend it for maximum impact?
-          Set your available budget and see which security improvements give you the best return.
+          {t('advisor.subtitle')}
         </p>
       </div>
 
@@ -71,10 +72,10 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
       <div className="steep-card p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-mist">
           <div>
-            <span className="text-xs uppercase font-bold tracking-wider text-slate">Available Security Budget</span>
+            <span className="text-xs uppercase font-bold tracking-wider text-slate">{t('advisor.budget')}</span>
             <h3 className="text-3xl font-bold text-sienna mt-1">{formatInr(budget)}</h3>
             <p className="text-xs text-slate mt-0.5">
-              Adjust the slider to see recommendations for different budget levels.
+              {t('advisor.budgetDesc')}
             </p>
           </div>
           {/* Quick Presets */}
@@ -118,7 +119,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
       {loadingOpt && (
         <div className="py-12 text-center">
           <div className="w-8 h-8 border-4 border-sienna border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-slate text-sm font-medium">Finding optimal security improvements…</p>
+          <p className="text-slate text-sm font-medium">{t('advisor.loading')}</p>
         </div>
       )}
 
@@ -131,30 +132,30 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
             <div className="space-y-4">
               <div className="steep-card-peach p-6">
                 <span className="text-xs font-bold uppercase tracking-wider text-sienna/80">
-                  Potential Exposure Reduction
+                  {t('advisor.reduction')}
                 </span>
                 <div className="text-4xl font-bold text-sienna mt-2">
                   {formatInr(optResult.total_risk_reduction_inr)}
                 </div>
                 <div className="mt-4 pt-4 border-t border-sienna/20 space-y-1.5 text-xs text-sienna font-medium">
                   <div className="flex justify-between">
-                    <span>Budget Used:</span>
+                    <span>{t('advisor.budgetUsed')}</span>
                     <span className="font-bold">{formatInr(optResult.total_cost_inr)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Improvements Selected:</span>
+                    <span>{t('advisor.improvements')}</span>
                     <span className="font-bold">{optResult.selected_controls.length}</span>
                   </div>
                 </div>
               </div>
 
-              {/* AI Analysis — no "Groq" */}
+              {/* AI Analysis */}
               {optResult.ai_rationale && (
                 <div className="steep-card p-5 bg-paper border-mist">
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-sienna" />
                     <h4 className="text-xs font-bold text-ink uppercase tracking-wider">
-                      AI Investment Analysis
+                      {t('advisor.aiAnalysis')}
                     </h4>
                   </div>
                   <p className="text-xs text-ink/80 leading-relaxed">{optResult.ai_rationale}</p>
@@ -169,7 +170,7 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                 >
                   <div className="flex items-center gap-2">
                     <Info className="w-3.5 h-3.5 text-slate" />
-                    <span className="text-xs font-semibold text-slate">How was this calculated?</span>
+                    <span className="text-xs font-semibold text-slate">{t('advisor.howCalc')}</span>
                   </div>
                   {showHowCalculated ? (
                     <ChevronUp className="w-3.5 h-3.5 text-slate" />
@@ -179,18 +180,8 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                 </button>
                 {showHowCalculated && (
                   <div className="mt-3 text-xs text-slate space-y-2 leading-relaxed border-t border-mist pt-3">
-                    <p>
-                      Each security improvement has an estimated implementation cost and a risk reduction value.
-                      The advisor selects the combination of improvements that reduces your financial exposure the most
-                      within your available budget.
-                    </p>
-                    <p>
-                      This approach prioritizes high-impact, cost-efficient improvements first — so you get maximum
-                      benefit from every rupee spent.
-                    </p>
-                    <p className="text-[11px] text-slate/70">
-                      Technical note: Uses a greedy optimization algorithm based on the FAIR risk model.
-                    </p>
+                    <p>{t('advisor.calcDesc1')}</p>
+                    <p>{t('advisor.calcDesc2')}</p>
                   </div>
                 )}
               </div>
@@ -202,10 +193,10 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-ink">
-                      Return on Security Investment (ROSI) Curve
+                      {t('advisor.rosiCurve')}
                     </h3>
                     <p className="text-xs text-slate mt-0.5">
-                      Cumulative Capital Expenditure (CapEx) vs. cumulative risk exposure reduction
+                      {t('advisor.rosiDesc')}
                     </p>
                   </div>
                 </div>
@@ -231,8 +222,8 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                         fontSize={11}
                       />
                       <Tooltip
-                        formatter={(value: any) => [formatInr(Number(value)), 'Exposure Reduction']}
-                        labelFormatter={(label: any) => `Investment: ${formatInr(Number(label))}`}
+                        formatter={(value: any) => [formatInr(Number(value)), t('advisor.reduction')]}
+                        labelFormatter={(label: any) => `${t('advisor.budgetUsed')} ${formatInr(Number(label))}`}
                         contentStyle={{
                           backgroundColor: '#ffffff',
                           borderRadius: '16px',
@@ -254,8 +245,8 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                 </div>
               </div>
               <div className="flex justify-between items-center text-[11px] text-slate pt-3 border-t border-mist">
-                <span>Steep curve = High-value early improvements (patch management, EDR)</span>
-                <span>Flatter curve = Advanced controls with diminishing returns</span>
+                <span>{t('advisor.steep')}</span>
+                <span>{t('advisor.flat')}</span>
               </div>
             </div>
           </div>
@@ -263,20 +254,20 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
           {/* Recommended Improvements Table */}
           <div className="steep-card p-6">
             <h3 className="text-xl font-bold text-ink mb-1">
-              Recommended Security Improvements
+              {t('advisor.improvements')}
             </h3>
             <p className="text-xs text-slate mb-4">
-              These improvements provide the best return on your security investment within your budget.
+              {t('advisor.subtitle')}
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-mist text-slate uppercase">
-                    <th className="py-2.5 px-3">Improvement</th>
-                    <th className="py-2.5 px-3 text-right">Implementation Cost</th>
-                    <th className="py-2.5 px-3 text-right">Estimated Exposure Reduction</th>
-                    <th className="py-2.5 px-3 text-right">Return on Investment</th>
-                    <th className="py-2.5 px-3 text-center">Priority</th>
+                    <th className="py-2.5 px-3">{t('advisor.table.improvement')}</th>
+                    <th className="py-2.5 px-3 text-right">{t('advisor.table.cost')}</th>
+                    <th className="py-2.5 px-3 text-right">{t('advisor.table.reduction')}</th>
+                    <th className="py-2.5 px-3 text-right">{t('advisor.table.roi')}</th>
+                    <th className="py-2.5 px-3 text-center">{t('advisor.table.priority')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-mist">
@@ -291,12 +282,12 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
                       </td>
                       <td className="py-3 px-3 text-right">
                         <span className="font-bold px-2 py-0.5 rounded-full bg-emerald/10 text-emerald">
-                          {c.roi_ratio.toFixed(1)}× return
+                          {c.roi_ratio.toFixed(1)}× {t('general.return')}
                         </span>
                       </td>
                       <td className="py-3 px-3 text-center">
                         <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-peach text-sienna">
-                          Priority #{idx + 1}
+                          {t('advisor.priority')}{idx + 1}
                         </span>
                       </td>
                     </tr>
