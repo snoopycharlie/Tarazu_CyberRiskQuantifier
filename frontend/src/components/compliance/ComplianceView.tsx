@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 import { ComplianceSummary, Organization } from '../../types';
 import { api } from '../../services/api';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { containerVariants, itemVariants } from '../../utils/animations';
 
 interface ComplianceViewProps {
   currentOrg: Organization | null;
@@ -38,7 +40,7 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
     if (currentOrg?.sector === 'Healthcare' && framework === 'RBI_CSF') {
       setFramework('HIPAA');
     }
-  }, [currentOrg]);
+  }, [currentOrg, framework]);
 
   useEffect(() => {
     if (currentOrg) {
@@ -64,61 +66,74 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
     return g.status === filterStatus;
   }) || [];
 
-  const activeFramework = FRAMEWORK_OPTIONS.find(f => f.id === framework);
-
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
       {/* Editorial Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
+          <span className="page-eyebrow mb-1">
             Regulatory Compliance
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
             {t('compliance.title')}
           </h1>
-          <p className="text-slate text-base mt-1 max-w-2xl">
+          <p className="text-base mt-2 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
             {t('compliance.subtitle')}
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Framework Tabs */}
-      <div className="flex flex-wrap gap-2">
-        {FRAMEWORK_OPTIONS.map((fw) => (
-          <button
-            key={fw.id}
-            onClick={() => setFramework(fw.id)}
-            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all border ${
-              framework === fw.id
-                ? 'bg-ink text-paper border-ink shadow-sm'
-                : 'bg-fog border-mist text-slate hover:text-ink hover:border-slate/30'
-            }`}
-          >
-            <div className="font-bold">{fw.label}</div>
-            <div className={`text-[10px] mt-0.5 ${framework === fw.id ? 'text-paper/60' : 'text-slate/70'}`}>
-              {fw.desc}
-            </div>
-          </button>
-        ))}
-      </div>
+      <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
+        {FRAMEWORK_OPTIONS.map((fw) => {
+          const isActive = framework === fw.id;
+          return (
+            <button
+              key={fw.id}
+              onClick={() => setFramework(fw.id)}
+              className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all border ${
+                isActive ? 'shadow-sm' : 'hover:border-slate-500/30'
+              }`}
+              style={isActive ? {
+                background: 'var(--bg-elevated)',
+                borderColor: 'var(--accent-primary)',
+                color: 'var(--text-primary)'
+              } : {
+                background: 'var(--bg-page)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              <div className="font-bold">{fw.label}</div>
+              <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.6 }}>
+                {fw.desc}
+              </div>
+            </button>
+          );
+        })}
+      </motion.div>
 
       {loading || !data ? (
-        <div className="py-24 text-center">
-          <div className="w-10 h-10 border-4 border-sienna border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate text-sm font-medium">{t('compliance.loading')}</p>
-          <p className="text-slate/60 text-xs mt-1">{t('compliance.loadingDesc')}</p>
-        </div>
+        <motion.div variants={itemVariants} className="py-24 text-center">
+          <div className="w-10 h-10 border-4 rounded-full animate-spin mx-auto mb-4" style={{ borderColor: 'var(--accent-primary)', borderTopColor: 'transparent' }} />
+          <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{t('compliance.loading')}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{t('compliance.loadingDesc')}</p>
+        </motion.div>
       ) : (
         <>
           {/* Readiness Score Card */}
-          <div className="steep-card p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-mist">
+          <motion.div variants={itemVariants} className="tarazu-card p-6 border-l-4" style={{ borderLeftColor: 'var(--accent-primary)' }}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
               <div>
-                <span className="text-xs uppercase font-bold tracking-wider text-slate">{t('compliance.score')}</span>
+                <span className="section-label">{t('compliance.score')}</span>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <h3 className="text-4xl font-bold text-sienna">{data.coverage_pct}%</h3>
-                  <span className="text-xs text-slate font-medium">
+                  <h3 className="text-4xl font-bold" style={{ color: 'var(--accent-primary)' }}>{data.coverage_pct}%</h3>
+                  <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                     {data.satisfied} {t('compliance.of')} {data.total_clauses} {t('compliance.clauses')}
                   </span>
                 </div>
@@ -126,94 +141,95 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
 
               {/* Progress Bar */}
               <div className="flex-1 max-w-md">
-                <div className="w-full h-3 bg-mist rounded-full overflow-hidden">
+                <div className="progress-track">
                   <div
-                    className="h-full bg-sienna transition-all duration-500 rounded-full"
-                    style={{ width: `${data.coverage_pct}%` }}
+                    className="progress-fill"
+                    style={{ width: `${data.coverage_pct}%`, background: 'var(--accent-primary)' }}
                   />
                 </div>
-                <div className="flex justify-between text-[11px] text-slate mt-2 font-medium">
-                  <span className="text-emerald font-semibold">{data.satisfied} {t('compliance.satisfied')}</span>
-                  <span className="text-crimson font-semibold">{data.gaps} {t('compliance.gaps')}</span>
+                <div className="flex justify-between text-[11px] mt-2 font-medium">
+                  <span className="font-semibold" style={{ color: 'var(--risk-low)' }}>{data.satisfied} {t('compliance.satisfied')}</span>
+                  <span className="font-semibold" style={{ color: 'var(--risk-high)' }}>{data.gaps} {t('compliance.gaps')}</span>
                 </div>
               </div>
             </div>
 
             {/* Smart Summary */}
             {data.ai_narrative && (
-              <div className="mt-5 p-4 rounded-2xl bg-peach/40 border border-sienna/20 flex items-start gap-3">
-                <Sparkles className="w-5 h-5 text-sienna shrink-0 mt-0.5" />
+              <div className="mt-5 p-4 rounded-xl flex items-start gap-3" style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-primary)', borderColor: 'rgba(56, 189, 248, 0.2)' }}>
+                <Sparkles className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'var(--accent-primary)' }} />
                 <div>
-                  <h4 className="text-xs font-bold text-sienna uppercase tracking-wider mb-1">
+                  <h4 className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--accent-primary)' }}>
                     {t('compliance.aiSummary')}
                   </h4>
-                  <p className="text-xs text-sienna/90 leading-relaxed">{data.ai_narrative}</p>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)', opacity: 0.9 }}>{data.ai_narrative}</p>
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
 
           {/* Filter Bar */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-ink">{t('compliance.requirementsReview')}</h3>
-            <div className="flex items-center gap-1 bg-fog p-1 rounded-pill border border-mist text-xs">
+          <motion.div variants={itemVariants} className="flex items-center justify-between">
+            <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('compliance.requirementsReview')}</h3>
+            <div className="flex items-center gap-1 p-1 rounded-full border text-xs" style={{ background: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}>
               <button
                 onClick={() => setFilterStatus('all')}
-                className={`px-3 py-1 rounded-pill font-medium transition ${
-                  filterStatus === 'all' ? 'bg-ink text-paper' : 'text-slate hover:text-ink'
+                className={`px-3 py-1 rounded-full font-medium transition-colors ${
+                  filterStatus === 'all' ? 'text-white' : 'hover:text-white'
                 }`}
+                style={filterStatus === 'all' ? { background: 'var(--accent-primary)' } : { color: 'var(--text-secondary)' }}
               >
                 {t('compliance.all')} ({data.total_clauses})
               </button>
               <button
                 onClick={() => setFilterStatus('satisfied')}
-                className={`px-3 py-1 rounded-pill font-medium transition ${
-                  filterStatus === 'satisfied' ? 'bg-emerald text-paper' : 'text-slate hover:text-ink'
+                className={`px-3 py-1 rounded-full font-medium transition-colors ${
+                  filterStatus === 'satisfied' ? 'text-black' : 'hover:text-white'
                 }`}
+                style={filterStatus === 'satisfied' ? { background: 'var(--risk-low)' } : { color: 'var(--text-secondary)' }}
               >
                 {t('compliance.satisfied')} ({data.satisfied})
               </button>
               <button
                 onClick={() => setFilterStatus('gap')}
-                className={`px-3 py-1 rounded-pill font-medium transition ${
-                  filterStatus === 'gap' ? 'bg-crimson text-paper' : 'text-slate hover:text-ink'
+                className={`px-3 py-1 rounded-full font-medium transition-colors ${
+                  filterStatus === 'gap' ? 'text-black' : 'hover:text-white'
                 }`}
+                style={filterStatus === 'gap' ? { background: 'var(--risk-high)' } : { color: 'var(--text-secondary)' }}
               >
                 {t('compliance.gaps')} ({data.gaps})
               </button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Requirements Table */}
-          <div className="steep-card p-6 overflow-hidden">
+          <motion.div variants={itemVariants} className="tarazu-card p-0 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-mist text-slate uppercase">
-                    <th className="py-2.5 px-3">{t('compliance.col.clause')}</th>
-                    <th className="py-2.5 px-3">{t('compliance.col.title')}</th>
-                    <th className="py-2.5 px-3">{t('compliance.col.control')}</th>
-                    <th className="py-2.5 px-3 text-center">{t('compliance.col.status')}</th>
-                    <th className="py-2.5 px-3">{t('compliance.col.impact')}</th>
+                  <tr className="border-b uppercase" style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-muted)' }}>
+                    <th className="py-3 px-4">{t('compliance.col.clause')}</th>
+                    <th className="py-3 px-4">{t('compliance.col.title')}</th>
+                    <th className="py-3 px-4">{t('compliance.col.control')}</th>
+                    <th className="py-3 px-4 text-center">{t('compliance.col.status')}</th>
+                    <th className="py-3 px-4">{t('compliance.col.impact')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-mist">
+                <tbody className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
                   {filteredGaps.map((item) => (
-                    <tr key={item.id} className="hover:bg-fog/60 transition">
-                      <td className="py-3 px-3 font-mono font-bold text-ink">{item.clause_ref}</td>
-                      <td className="py-3 px-3 font-semibold text-ink max-w-xs">{item.clause_title}</td>
-                      <td className="py-3 px-3 text-slate">
+                    <tr key={item.id} className="transition-colors hover:bg-black/5 dark:hover:bg-white/5">
+                      <td className="py-3 px-4 font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{item.clause_ref}</td>
+                      <td className="py-3 px-4 font-semibold max-w-xs" style={{ color: 'var(--text-primary)' }}>{item.clause_title}</td>
+                      <td className="py-3 px-4">
                         {item.control_name ? (
-                          <span className="font-medium text-ink">{item.control_name}</span>
+                          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{item.control_name}</span>
                         ) : (
-                          <span className="italic text-slate/80">{t('compliance.noControl')}</span>
+                          <span className="italic" style={{ color: 'var(--text-muted)' }}>{t('compliance.noControl')}</span>
                         )}
                       </td>
-                      <td className="py-3 px-3 text-center">
+                      <td className="py-3 px-4 text-center">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase inline-flex items-center gap-1 ${
-                          item.status === 'satisfied'
-                            ? 'bg-emerald/10 text-emerald'
-                            : 'bg-crimson/10 text-crimson'
+                          item.status === 'satisfied' ? 'risk-badge-low' : 'risk-badge-high'
                         }`}>
                           {item.status === 'satisfied' ? (
                             <>
@@ -228,11 +244,11 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
                           )}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-slate text-[11px]">
+                      <td className="py-3 px-4 text-[11px]">
                         {item.status === 'satisfied' ? (
-                          <span className="text-emerald">{t('compliance.met')}</span>
+                          <span style={{ color: 'var(--risk-low)' }}>{t('compliance.met')}</span>
                         ) : (
-                          <span className="text-crimson font-medium">{t('compliance.needsAttention')}</span>
+                          <span className="font-medium" style={{ color: 'var(--risk-high)' }}>{t('compliance.needsAttention')}</span>
                         )}
                       </td>
                     </tr>
@@ -240,9 +256,9 @@ export const ComplianceView: React.FC<ComplianceViewProps> = ({ currentOrg }) =>
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 };

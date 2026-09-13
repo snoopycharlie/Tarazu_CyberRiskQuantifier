@@ -1,96 +1,172 @@
+/* ── Google Fonts: Inter ──────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* ── Light Theme (Premium Fintech/Enterprise) ── */
-    --bg-page: #f8fafc;
-    --bg-surface: #ffffff;
-    --bg-surface-hover: #f1f5f9;
-    --bg-elevated: #ffffff;
-    
-    --border-subtle: #e2e8f0;
-    --border-strong: #cbd5e1;
-    
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
-    
-    --accent-primary: #2563eb;
-    --accent-primary-hover: #1d4ed8;
-    --accent-subtle: #eff6ff;
-    
-    /* Risk Semantic Colors */
-    --risk-critical: #dc2626;
-    --risk-critical-bg: #fef2f2;
-    --risk-critical-border: #fca5a5;
-    
-    --risk-high: #d97706;
-    --risk-high-bg: #fffbeb;
-    --risk-high-border: #fcd34d;
-    
-    --risk-medium: #2563eb;
-    --risk-medium-bg: #eff6ff;
-    --risk-medium-border: #93c5fd;
-    
-    --risk-low: #059669;
-    --risk-low-bg: #ecfdf5;
-    --risk-low-border: #6ee7b7;
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       LIGHT THEME — Deep Navy command palette, cool surfaces
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-    
-    --scrollbar-bg: #f8fafc;
-    --scrollbar-thumb: #cbd5e1;
-    --scrollbar-thumb-hover: #94a3b8;
+    /* Surfaces */
+    --bg-page:          #F0F4F8;
+    --bg-surface:       #FFFFFF;
+    --bg-surface-hover: #EBF1F8;
+    --bg-elevated:      #FFFFFF;
+
+    /* Borders */
+    --border-subtle: #D1DCE8;
+    --border-strong: #9BB0C8;
+
+    /* Text */
+    --text-primary:   #0C1B33;
+    --text-secondary: #3E5A7A;
+    --text-muted:     #7A9BB8;
+
+    /* Brand / Accent — Electric Teal */
+    --accent-primary:       #00C4B4;
+    --accent-primary-hover: #009E90;
+    --accent-subtle:        rgba(0, 196, 180, 0.08);
+    --accent-strong:        rgba(0, 196, 180, 0.15);
+    --accent-secondary:     #F57C00;   /* amber — investment/advisory accent */
+
+    /* Navbar specific */
+    --nav-bg:            rgba(255, 255, 255, 0.92);
+    --nav-border:        #D1DCE8;
+    --nav-active:        #00C4B4;
+    --nav-inactive:      #3E5A7A;
+
+    /* ── Risk Semantic Colors ─────────────────────────────── */
+    --risk-critical:        #E8282D;
+    --risk-critical-bg:     rgba(232, 40, 45, 0.06);
+    --risk-critical-border: rgba(232, 40, 45, 0.20);
+    --risk-critical-glow:   rgba(232, 40, 45, 0.15);
+
+    --risk-high:        #F57C00;
+    --risk-high-bg:     rgba(245, 124, 0, 0.06);
+    --risk-high-border: rgba(245, 124, 0, 0.20);
+    --risk-high-glow:   rgba(245, 124, 0, 0.15);
+
+    --risk-medium:        #00C4B4;
+    --risk-medium-bg:     rgba(0, 196, 180, 0.06);
+    --risk-medium-border: rgba(0, 196, 180, 0.20);
+
+    --risk-low:        #1BAF6E;
+    --risk-low-bg:     rgba(27, 175, 110, 0.06);
+    --risk-low-border: rgba(27, 175, 110, 0.20);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(12, 27, 51, 0.06), 0 0 0 1px rgba(12, 27, 51, 0.04);
+    --shadow-md: 0 4px 12px 0 rgba(12, 27, 51, 0.08), 0 0 0 1px rgba(12, 27, 51, 0.05);
+    --shadow-lg: 0 12px 32px 0 rgba(12, 27, 51, 0.10), 0 0 0 1px rgba(12, 27, 51, 0.06);
+    --shadow-xl: 0 24px 48px 0 rgba(12, 27, 51, 0.14), 0 0 0 1px rgba(12, 27, 51, 0.07);
+
+    /* Glows */
+    --glow-teal:     0 0 0 3px rgba(0, 196, 180, 0.20);
+    --glow-critical: 0 0 20px rgba(232, 40, 45, 0.15);
+    --glow-amber:    0 0 20px rgba(245, 124, 0, 0.15);
+
+    /* Scrollbar */
+    --scrollbar-bg:          #F0F4F8;
+    --scrollbar-thumb:       #9BB0C8;
+    --scrollbar-thumb-hover: #3E5A7A;
+
+    /* Card accent borders (left-border by severity) */
+    --card-accent-teal:     #00C4B4;
+    --card-accent-amber:    #F57C00;
+    --card-accent-crimson:  #E8282D;
+    --card-accent-emerald:  #1BAF6E;
+    --card-accent-navy:     #3E5A7A;
+
+    /* Gradient: brand */
+    --gradient-brand: linear-gradient(135deg, #00C4B4 0%, #009E90 100%);
+    --gradient-brand-subtle: linear-gradient(135deg, rgba(0,196,180,0.12) 0%, rgba(0,158,144,0.06) 100%);
   }
 
   .dark {
-    /* ── Dark Theme (Cybersecurity Command Center) ── */
-    --bg-page: #0B1220;
-    --bg-surface: #101827;
-    --bg-surface-hover: #151F31;
-    --bg-elevated: #1B2639;
-    
-    --border-subtle: #1e293b;
-    --border-strong: #334155;
-    
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    
-    --accent-primary: #3b82f6;
-    --accent-primary-hover: #60a5fa;
-    --accent-subtle: rgba(59, 130, 246, 0.1);
-    
-    /* Risk Semantic Colors */
-    --risk-critical: #ef4444;
-    --risk-critical-bg: rgba(239, 68, 68, 0.1);
-    --risk-critical-border: rgba(239, 68, 68, 0.3);
-    
-    --risk-high: #f59e0b;
-    --risk-high-bg: rgba(245, 158, 11, 0.1);
-    --risk-high-border: rgba(245, 158, 11, 0.3);
-    
-    --risk-medium: #3b82f6;
-    --risk-medium-bg: rgba(59, 130, 246, 0.1);
-    --risk-medium-border: rgba(59, 130, 246, 0.3);
-    
-    --risk-low: #10b981;
-    --risk-low-bg: rgba(16, 185, 129, 0.1);
-    --risk-low-border: rgba(16, 185, 129, 0.3);
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       DARK THEME — Cybersecurity Command Center
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-    --shadow-lg: 0 10px 25px -3px rgb(0 0 0 / 0.5), 0 4px 10px -4px rgb(0 0 0 / 0.5);
-    
-    --scrollbar-bg: #0B1220;
-    --scrollbar-thumb: #334155;
-    --scrollbar-thumb-hover: #475569;
+    /* Surfaces */
+    --bg-page:          #080E1A;
+    --bg-surface:       #0F1929;
+    --bg-surface-hover: #162134;
+    --bg-elevated:      #1A2840;
+
+    /* Borders */
+    --border-subtle: #1C2E45;
+    --border-strong: #243C5A;
+
+    /* Text */
+    --text-primary:   #E8F1FB;
+    --text-secondary: #7FA8CC;
+    --text-muted:     #3D5B7A;
+
+    /* Brand / Accent — Electric Teal (brighter in dark) */
+    --accent-primary:       #00D4C4;
+    --accent-primary-hover: #00E4D4;
+    --accent-subtle:        rgba(0, 212, 196, 0.10);
+    --accent-strong:        rgba(0, 212, 196, 0.18);
+    --accent-secondary:     #FFB300;   /* amber — brighter in dark */
+
+    /* Navbar specific */
+    --nav-bg:            rgba(8, 14, 26, 0.92);
+    --nav-border:        #1C2E45;
+    --nav-active:        #00D4C4;
+    --nav-inactive:      #7FA8CC;
+
+    /* ── Risk Semantic Colors ─────────────────────────────── */
+    --risk-critical:        #FF4D52;
+    --risk-critical-bg:     rgba(255, 77, 82, 0.10);
+    --risk-critical-border: rgba(255, 77, 82, 0.25);
+    --risk-critical-glow:   rgba(255, 77, 82, 0.20);
+
+    --risk-high:        #FFB300;
+    --risk-high-bg:     rgba(255, 179, 0, 0.10);
+    --risk-high-border: rgba(255, 179, 0, 0.25);
+    --risk-high-glow:   rgba(255, 179, 0, 0.20);
+
+    --risk-medium:        #00D4C4;
+    --risk-medium-bg:     rgba(0, 212, 196, 0.10);
+    --risk-medium-border: rgba(0, 212, 196, 0.25);
+
+    --risk-low:        #22D38A;
+    --risk-low-bg:     rgba(34, 211, 138, 0.10);
+    --risk-low-border: rgba(34, 211, 138, 0.25);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.30), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --shadow-md: 0 4px 16px 0 rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --shadow-lg: 0 12px 36px 0 rgba(0, 0, 0, 0.50), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --shadow-xl: 0 24px 56px 0 rgba(0, 0, 0, 0.60), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+    /* Glows */
+    --glow-teal:     0 0 0 3px rgba(0, 212, 196, 0.25);
+    --glow-critical: 0 0 24px rgba(255, 77, 82, 0.20);
+    --glow-amber:    0 0 24px rgba(255, 179, 0, 0.20);
+
+    /* Scrollbar */
+    --scrollbar-bg:          #080E1A;
+    --scrollbar-thumb:       #243C5A;
+    --scrollbar-thumb-hover: #3E5A7A;
+
+    /* Card accent borders */
+    --card-accent-teal:     #00D4C4;
+    --card-accent-amber:    #FFB300;
+    --card-accent-crimson:  #FF4D52;
+    --card-accent-emerald:  #22D38A;
+    --card-accent-navy:     #7FA8CC;
+
+    /* Gradient: brand */
+    --gradient-brand: linear-gradient(135deg, #00D4C4 0%, #00C4B4 100%);
+    --gradient-brand-subtle: linear-gradient(135deg, rgba(0,212,196,0.12) 0%, rgba(0,196,180,0.06) 100%);
   }
 
+  /* ── Base HTML ──────────────────────────────────────────── */
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -101,15 +177,16 @@
   body {
     background-color: var(--bg-page);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     line-height: 1.6;
+    font-size: 14px;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  /* Force Inter everywhere, override editorial */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    letter-spacing: -0.02em;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
   }
 
   *,
@@ -119,78 +196,142 @@
   }
 }
 
-/* ──────────────────────────────────────────────────────────────
-   COMPONENT CLASSES (Theme-aware)
-   ────────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   COMPONENT CLASSES — Theme-aware design system
+   ══════════════════════════════════════════════════════════════ */
 @layer components {
-  /* Standardized Card */
+
+  /* ── Cards ──────────────────────────────────────────────── */
+
+  /* Base card — used everywhere */
   .tarazu-card {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: var(--shadow-sm);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   }
-
   .tarazu-card:hover {
     border-color: var(--border-strong);
     box-shadow: var(--shadow-md);
   }
 
-  /* Elevated Card (Modals, Dropdowns) */
+  /* Elevated card — modals, dropdowns, popovers */
   .tarazu-card-elevated {
     background-color: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
-    border-radius: 16px;
+    border-radius: 12px;
     box-shadow: var(--shadow-lg);
   }
 
-  /* Legacy remappings to prevent immediate breakage */
-  .cyber-card, .steep-card {
+  /* Legacy remappings — prevent immediate breakage */
+  .cyber-card,
+  .steep-card {
     @apply tarazu-card;
   }
-
   .steep-card-peach {
     background-color: var(--accent-subtle);
     border: 1px solid var(--accent-primary);
-    border-radius: 12px;
+    border-radius: 10px;
     color: var(--accent-primary);
     box-shadow: var(--shadow-sm);
   }
-
   .glass-panel {
     @apply tarazu-card-elevated;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background-color: rgba(var(--bg-elevated), 0.85); /* Requires separate handling or just use solid */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
-  /* ── Risk badges ─────────────────────────────────────── */
+  /* Accent-border card variants (left-border severity indicators) */
+  .tarazu-card-critical {
+    @apply tarazu-card;
+    border-left: 3px solid var(--card-accent-crimson);
+  }
+  .tarazu-card-high {
+    @apply tarazu-card;
+    border-left: 3px solid var(--card-accent-amber);
+  }
+  .tarazu-card-teal {
+    @apply tarazu-card;
+    border-left: 3px solid var(--card-accent-teal);
+  }
+  .tarazu-card-low {
+    @apply tarazu-card;
+    border-left: 3px solid var(--card-accent-emerald);
+  }
+
+  /* ── Modal Chrome ───────────────────────────────────────── */
+  .tarazu-modal {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    position: relative;
+  }
+  .tarazu-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-brand);
+    border-radius: 14px 14px 0 0;
+  }
+
+  /* ── Typography utilities ───────────────────────────────── */
+
+  /* Large KPI / metric number */
+  .metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Section category label (small uppercase) */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Page eyebrow text (above main heading) */
+  .page-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── Risk Badges ────────────────────────────────────────── */
   .risk-badge {
-    @apply inline-flex items-center justify-center rounded-md px-2 py-0.5 text-xs font-semibold whitespace-nowrap border;
+    @apply inline-flex items-center justify-center rounded px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap border;
+    letter-spacing: 0.02em;
   }
-
   .risk-badge-critical {
     @apply risk-badge;
     background-color: var(--risk-critical-bg);
     color: var(--risk-critical);
     border-color: var(--risk-critical-border);
   }
-
   .risk-badge-high {
     @apply risk-badge;
     background-color: var(--risk-high-bg);
     color: var(--risk-high);
     border-color: var(--risk-high-border);
   }
-
   .risk-badge-medium {
     @apply risk-badge;
     background-color: var(--risk-medium-bg);
     color: var(--risk-medium);
     border-color: var(--risk-medium-border);
   }
-
   .risk-badge-low {
     @apply risk-badge;
     background-color: var(--risk-low-bg);
@@ -198,77 +339,222 @@
     border-color: var(--risk-low-border);
   }
 
-  /* ── Buttons ─────────────────────────────────────────── */
+  /* ── Buttons ────────────────────────────────────────────── */
+
+  /* Primary — teal fill */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ease-out border border-transparent whitespace-nowrap cursor-pointer;
-    background-color: var(--accent-primary);
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all duration-150 ease-out border border-transparent whitespace-nowrap cursor-pointer select-none;
+    border-radius: 8px;
+    background: var(--gradient-brand);
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,196,180,0.30);
+  }
+  .btn-primary:hover:not(:disabled) {
+    opacity: 0.90;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,196,180,0.35);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .btn-primary:disabled {
+    @apply opacity-40 cursor-not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Secondary — outlined */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium transition-all duration-150 ease-out whitespace-nowrap cursor-pointer select-none;
+    border-radius: 8px;
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+  .btn-secondary:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+
+  /* Ghost / text button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-150 ease-out whitespace-nowrap cursor-pointer select-none rounded-lg;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+  }
+
+  /* Danger */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all duration-150 ease-out whitespace-nowrap cursor-pointer select-none;
+    border-radius: 8px;
+    background-color: var(--risk-critical-bg);
+    color: var(--risk-critical);
+    border: 1px solid var(--risk-critical-border);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background-color: var(--risk-critical);
     color: #ffffff;
   }
 
-  .btn-primary:hover:not(:disabled) {
-    background-color: var(--accent-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .btn-primary:disabled {
-    @apply opacity-50 cursor-not-allowed transform-none shadow-none;
-  }
-
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ease-out whitespace-nowrap cursor-pointer;
-    background-color: var(--bg-surface);
-    color: var(--text-primary);
-    border: 1px solid var(--border-strong);
-  }
-
-  .btn-secondary:hover:not(:disabled) {
-    background-color: var(--bg-surface-hover);
-  }
-
-  .btn-secondary:disabled {
-    @apply opacity-50 cursor-not-allowed transform-none shadow-none;
-  }
-
-  /* ── Form inputs ─────────────────────────────────────── */
+  /* ── Form inputs ────────────────────────────────────────── */
   .cyber-input {
-    @apply w-full px-4 py-2.5 rounded-lg text-[15px] transition-all duration-150 ease-out outline-none font-sans;
+    @apply w-full px-4 py-2.5 text-sm transition-all duration-150 ease-out outline-none font-sans;
+    border-radius: 8px;
     border: 1px solid var(--border-strong);
     background-color: var(--bg-surface);
     color: var(--text-primary);
   }
-
   .cyber-input::placeholder {
     color: var(--text-muted);
   }
-
   .cyber-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px var(--accent-subtle);
+    box-shadow: var(--glow-teal);
+  }
+  .cyber-input:hover:not(:focus) {
+    border-color: var(--border-strong);
   }
 
-  /* ── Status dot ──────────────────────────────────────── */
+  /* Select/dropdown inherits cyber-input */
+  .cyber-select {
+    @apply cyber-input;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A9BB8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* ── Status dots ────────────────────────────────────────── */
   .status-dot {
-    @apply w-2 h-2 rounded-full inline-block;
+    @apply w-2 h-2 rounded-full inline-block shrink-0;
+  }
+  .status-dot-online   { background-color: var(--risk-low); }
+  .status-dot-warning  { background-color: var(--risk-high); }
+  .status-dot-critical { background-color: var(--risk-critical); }
+
+  /* ── Pill / chip ────────────────────────────────────────── */
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border whitespace-nowrap;
+    background-color: var(--bg-surface-hover);
+    color: var(--text-secondary);
+    border-color: var(--border-subtle);
+    transition: all 0.15s ease;
+  }
+  .chip:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background-color: var(--accent-subtle);
+  }
+  .chip-active {
+    @apply chip;
+    background-color: var(--accent-subtle);
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
   }
 
-  .status-dot-online { background-color: var(--risk-low); }
-  .status-dot-warning { background-color: var(--risk-high); }
-  .status-dot-critical { background-color: var(--risk-critical); }
+  /* ── Progress bar ───────────────────────────────────────── */
+  .progress-track {
+    @apply w-full overflow-hidden;
+    height: 4px;
+    border-radius: 2px;
+    background-color: var(--border-subtle);
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--gradient-brand);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .progress-fill-critical {
+    @apply progress-fill;
+    background: var(--risk-critical);
+  }
+  .progress-fill-amber {
+    @apply progress-fill;
+    background: var(--risk-high);
+  }
+  .progress-fill-emerald {
+    @apply progress-fill;
+    background: var(--risk-low);
+  }
+
+  /* ── Divider ────────────────────────────────────────────── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    margin: 0;
+  }
+
+  /* ── Empty state ────────────────────────────────────────── */
+  .empty-state {
+    @apply flex flex-col items-center justify-center text-center py-16 px-8;
+    color: var(--text-muted);
+  }
+  .empty-state-icon {
+    @apply w-12 h-12 mb-4 opacity-30;
+    color: var(--accent-primary);
+  }
+  .empty-state-title {
+    @apply text-sm font-semibold mb-1;
+    color: var(--text-secondary);
+  }
+  .empty-state-desc {
+    @apply text-xs leading-relaxed max-w-xs;
+  }
+
+  /* ── Table styles ───────────────────────────────────────── */
+  .tarazu-table {
+    @apply w-full;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .tarazu-table th {
+    @apply text-left px-4 py-3 text-[11px] font-semibold uppercase tracking-wider;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+    background-color: var(--bg-surface-hover);
+    letter-spacing: 0.08em;
+  }
+  .tarazu-table th:first-child { border-radius: 8px 0 0 0; }
+  .tarazu-table th:last-child  { border-radius: 0 8px 0 0; }
+  .tarazu-table td {
+    @apply px-4 py-3 text-sm;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background-color 0.1s ease;
+  }
+  .tarazu-table tr:hover td {
+    background-color: var(--bg-surface-hover);
+  }
+  .tarazu-table tr:last-child td {
+    border-bottom: none;
+  }
 }
 
-/* ──────────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════════
    CUSTOM SCROLLBAR
-   ────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+   ══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar          { width: 5px; height: 5px; }
+::-webkit-scrollbar-track    { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb    { background: var(--scrollbar-thumb); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg); }
+*                            { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg); }
 
-/* ──────────────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════════
    UTILITY OVERRIDES
-   ────────────────────────────────────────────────────────────── */
+   ══════════════════════════════════════════════════════════════ */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { scrollbar-width: none; }
 
@@ -276,9 +562,25 @@
 :focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Base setup for xyflow to ensure it works correctly */
+/* React Flow (xyflow) node base */
 .react-flow__node {
-  border-radius: 12px;
+  border-radius: 10px;
+}
+.react-flow__handle {
+  background: var(--accent-primary) !important;
+  border-color: var(--bg-elevated) !important;
+}
+.react-flow__edge-path {
+  stroke: var(--border-strong) !important;
+}
+
+/* Reduced-motion baseline — Framer Motion handles the rest */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

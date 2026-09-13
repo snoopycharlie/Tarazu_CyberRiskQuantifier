@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, BookOpen, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { slideUpVariants } from '../../utils/animations';
 
 interface TutorialStep {
   step: number;
@@ -78,15 +80,11 @@ export const DemoGuide: React.FC<TutorialProps> = ({ onNavigate, onClose, isOpen
   const [currentStep, setCurrentStep] = useState(0);
   const { t } = useLanguage();
 
-  if (!isOpen) return null;
-
   const step = TUTORIAL_STEPS[currentStep];
   const isFirst = currentStep === 0;
   const isLast = currentStep === TUTORIAL_STEPS.length - 1;
 
-  const goTo = (tab: string) => {
-    onNavigate(tab);
-  };
+  const goTo = (tab: string) => { onNavigate(tab); };
 
   const next = () => {
     if (!isLast) {
@@ -107,123 +105,170 @@ export const DemoGuide: React.FC<TutorialProps> = ({ onNavigate, onClose, isOpen
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
-      <div className="bg-ink text-paper rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
-        {/* Progress bar */}
-        <div className="h-0.5" style={{ background: 'rgba(51,65,85,0.5)' }}>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          variants={slideUpVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
+        >
           <div
-            className="h-full transition-all duration-500"
+            className="rounded-2xl overflow-hidden"
             style={{
-              width: `${((currentStep + 1) / TUTORIAL_STEPS.length) * 100}%`,
-              background: 'linear-gradient(90deg, #2563eb, #06b6d4)',
+              background: '#0F1929',
+              border: '1px solid rgba(0,212,196,0.15)',
+              boxShadow: '0 24px 48px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.04)',
             }}
-          />
-        </div>
-
-        <div className="p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              {/* Step indicator */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#60a5fa' }}>
-                  {t('tutorial.header')}
-                </span>
-                <span className="text-[10px]" style={{ color: 'rgba(148,163,184,0.4)' }}>
-                  {t('tutorial.step')} {step.step} {t('tutorial.of')} {TUTORIAL_STEPS.length}
-                </span>
-              </div>
-
-              <h3 className="text-lg font-bold text-paper leading-tight">
-                {step.title}
-              </h3>
-              <p className="text-paper/60 text-xs mt-1.5 leading-relaxed">
-                {step.description}
-              </p>
-
-              {/* Highlight */}
-              <div
-                className="mt-3 flex items-start gap-2 p-3 rounded-xl"
-                style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)' }}
-              >
-                <span className="text-xs" style={{ color: '#60a5fa' }}>→</span>
-                <p className="text-xs leading-relaxed font-medium" style={{ color: '#93c5fd' }}>
-                  {step.highlight}
-                </p>
-              </div>
+          >
+            {/* Progress bar */}
+            <div className="h-0.5" style={{ background: 'rgba(28,46,69,0.8)' }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: 'linear-gradient(90deg, #00D4C4, #009E90)' }}
+                animate={{ width: `${((currentStep + 1) / TUTORIAL_STEPS.length) * 100}%` }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              />
             </div>
 
-            <button
-              onClick={onClose}
-              className="text-paper/40 hover:text-paper transition p-1 shrink-0"
-              aria-label="Close tutorial"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+            <div className="p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  {/* Step indicator */}
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-[0.12em]"
+                      style={{ color: '#00D4C4' }}
+                    >
+                      {t('tutorial.header')}
+                    </span>
+                    <span className="text-[10px]" style={{ color: 'rgba(127,168,204,0.4)' }}>
+                      {t('tutorial.step')} {step.step} {t('tutorial.of')} {TUTORIAL_STEPS.length}
+                    </span>
+                  </div>
 
-          {/* Controls */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
-            {/* Step dots */}
-            <div className="flex items-center gap-1.5">
-              {TUTORIAL_STEPS.map((_, i) => (
+                  <h3
+                    className="text-base font-bold leading-tight"
+                    style={{ color: '#E8F1FB' }}
+                  >
+                    {step.title}
+                  </h3>
+                  <p
+                    className="text-xs mt-1.5 leading-relaxed"
+                    style={{ color: 'rgba(127,168,204,0.75)' }}
+                  >
+                    {step.description}
+                  </p>
+
+                  {/* Highlight */}
+                  <div
+                    className="mt-3 flex items-start gap-2 p-3 rounded-xl"
+                    style={{
+                      background: 'rgba(0,212,196,0.06)',
+                      border: '1px solid rgba(0,212,196,0.15)',
+                    }}
+                  >
+                    <span className="text-xs shrink-0 mt-0.5" style={{ color: '#00D4C4' }}>→</span>
+                    <p className="text-xs leading-relaxed font-medium" style={{ color: 'rgba(0,212,196,0.85)' }}>
+                      {step.highlight}
+                    </p>
+                  </div>
+                </div>
+
                 <button
-                  key={i}
-                  onClick={() => {
-                    setCurrentStep(i);
-                    goTo(TUTORIAL_STEPS[i].tab);
-                  }}
-                  className="rounded-full transition-all"
-                  style={{
-                    width: i === currentStep ? '20px' : '8px',
-                    height: '8px',
-                    background: i === currentStep
-                      ? '#3b82f6'
-                      : i < currentStep
-                      ? 'rgba(59,130,246,0.35)'
-                      : 'rgba(255,255,255,0.15)',
-                  }}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Go to page */}
-              <button
-                onClick={() => goTo(step.tab)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-white/10 text-paper text-xs font-semibold hover:bg-white/20 transition"
-              >
-                <ArrowUpRight className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{step.action}</span>
-                <span className="sm:hidden">Go</span>
-              </button>
-
-              {!isFirst && (
-                <button
-                  onClick={prev}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-pill bg-white/10 text-paper text-xs font-semibold hover:bg-white/20 transition"
+                  onClick={onClose}
+                  className="p-1.5 rounded-lg transition-colors shrink-0"
+                  style={{ color: 'rgba(127,168,204,0.5)' }}
+                  aria-label="Close tutorial"
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#E8F1FB'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(127,168,204,0.5)'; }}
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  <span>{t('tutorial.back')}</span>
+                  <X className="w-4 h-4" />
                 </button>
-              )}
+              </div>
 
-              <button
-                onClick={next}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all"
-                style={{
-                  background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
-                  color: '#ffffff',
-                  boxShadow: '0 0 12px rgba(59,130,246,0.3)',
-                }}
+              {/* Controls */}
+              <div
+                className="flex items-center justify-between mt-4 pt-3"
+                style={{ borderTop: '1px solid rgba(28,46,69,0.8)' }}
               >
-                <span>{isLast ? t('tutorial.finish') : t('tutorial.next')}</span>
-                {!isLast && <ChevronRight className="w-3.5 h-3.5" />}
-              </button>
+                {/* Step dots */}
+                <div className="flex items-center gap-1.5">
+                  {TUTORIAL_STEPS.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setCurrentStep(i); goTo(TUTORIAL_STEPS[i].tab); }}
+                      className="rounded-full transition-all"
+                      style={{
+                        width: i === currentStep ? '20px' : '7px',
+                        height: '7px',
+                        background: i === currentStep
+                          ? '#00D4C4'
+                          : i < currentStep
+                          ? 'rgba(0,212,196,0.30)'
+                          : 'rgba(255,255,255,0.12)',
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {/* Go to page */}
+                  <button
+                    onClick={() => goTo(step.tab)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                    style={{
+                      background: 'rgba(255,255,255,0.07)',
+                      color: '#E8F1FB',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.07)'; }}
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{step.action}</span>
+                    <span className="sm:hidden">Go</span>
+                  </button>
+
+                  {!isFirst && (
+                    <button
+                      onClick={prev}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                      style={{
+                        background: 'rgba(255,255,255,0.07)',
+                        color: '#E8F1FB',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.12)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.07)'; }}
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>{t('tutorial.back')}</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={next}
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all"
+                    style={{
+                      background: 'linear-gradient(135deg, #00D4C4 0%, #009E90 100%)',
+                      color: '#ffffff',
+                      boxShadow: '0 2px 8px rgba(0,212,196,0.35)',
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.85'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+                  >
+                    <span>{isLast ? t('tutorial.finish') : t('tutorial.next')}</span>
+                    {!isLast && <ChevronRight className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -237,19 +282,17 @@ export const DemoGuideButton: React.FC<TutorialButtonProps> = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all"
+      className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
       style={{
-        background: 'rgba(59,130,246,0.08)',
-        border: '1px solid rgba(59,130,246,0.2)',
-        color: '#93c5fd',
+        background: 'var(--accent-subtle)',
+        border: '1px solid var(--accent-primary)',
+        color: 'var(--accent-primary)',
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(59,130,246,0.15)';
-        (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(59,130,246,0.35)';
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent-strong)';
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(59,130,246,0.08)';
-        (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(59,130,246,0.2)';
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent-subtle)';
       }}
     >
       <BookOpen className="w-3.5 h-3.5" />

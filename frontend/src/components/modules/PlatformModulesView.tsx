@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { containerVariants, itemVariants } from '../../animations';
 import {
   FileUp,
   MessageSquareCode,
@@ -473,9 +475,14 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-8"
+    >
       {/* Editorial Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-mist">
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-subtle">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-peach text-sienna tracking-wide">
@@ -493,7 +500,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
         </div>
 
         {/* Top Module Switcher */}
-        <div className="flex items-center gap-2 bg-fog p-1 rounded-pill border border-mist">
+        <div className="flex items-center gap-2 bg-page p-1 rounded-pill border border-subtle">
           <button
             onClick={() => setActiveModule('document_parsing')}
             className={`px-4 py-2 rounded-pill text-xs font-semibold transition flex items-center gap-2 ${
@@ -522,11 +529,18 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
       {/* ══════════════════════════════════════════════════════════════════════
           MODULE 1: AUTOMATED DOCUMENT INGESTION & POLICY PARSING
          ══════════════════════════════════════════════════════════════════════ */}
-      {activeModule === 'document_parsing' && (
-        <div className="space-y-6">
+      <AnimatePresence mode="wait">
+        {activeModule === 'document_parsing' && (
+          <motion.div
+            key="document_parsing"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-6"
+          >
           {/* Controls & Configuration Bar */}
-          <div className="steep-card p-6 space-y-5">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
+          <div className="tarazu-card p-6 space-y-5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-subtle">
               <div>
                 <h3 className="text-2xl font-bold text-ink">
                   Multi-Modal Document Parsing Pipeline
@@ -554,7 +568,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     className={`px-3.5 py-1.5 text-xs font-semibold rounded-pill transition ${
                       parseMode === m.id
                         ? 'bg-sienna text-paper shadow-sm'
-                        : 'bg-fog border border-mist text-slate hover:text-ink'
+                        : 'bg-page border border-subtle text-slate hover:text-ink'
                     }`}
                   >
                     {m.label}
@@ -580,7 +594,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     className={`p-3.5 rounded-2xl border cursor-pointer transition flex items-start gap-3 ${
                       selectedPreset === 'rbi_nbfc_cyber_policy' && !uploadedFileName
                         ? 'bg-peach/30 border-sienna text-sienna'
-                        : 'bg-fog border-mist text-slate hover:border-slate/40'
+                        : 'bg-page border-subtle text-slate hover:border-slate/40'
                     }`}
                   >
                     <FileText className="w-5 h-5 shrink-0 text-sienna mt-0.5" />
@@ -599,7 +613,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     className={`p-3.5 rounded-2xl border cursor-pointer transition flex items-start gap-3 ${
                       selectedPreset === 'soc2_type2_audit' && !uploadedFileName
                         ? 'bg-peach/30 border-sienna text-sienna'
-                        : 'bg-fog border-mist text-slate hover:border-slate/40'
+                        : 'bg-page border-subtle text-slate hover:border-slate/40'
                     }`}
                   >
                     <FileCode className="w-5 h-5 shrink-0 text-sienna mt-0.5" />
@@ -618,7 +632,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     className={`p-3.5 rounded-2xl border cursor-pointer transition flex items-start gap-3 ${
                       selectedPreset === 'aws_cloud_architecture' && !uploadedFileName
                         ? 'bg-peach/30 border-sienna text-sienna'
-                        : 'bg-fog border-mist text-slate hover:border-slate/40'
+                        : 'bg-page border-subtle text-slate hover:border-slate/40'
                     }`}
                   >
                     <Layers className="w-5 h-5 shrink-0 text-sienna mt-0.5" />
@@ -635,7 +649,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                 <span className="text-xs font-bold text-slate uppercase tracking-wider block">
                   Or Upload Custom Document:
                 </span>
-                <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-mist hover:border-sienna/50 rounded-2xl cursor-pointer bg-fog/50 hover:bg-peach/10 transition text-center h-[178px]">
+                <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-subtle hover:border-sienna/50 rounded-2xl cursor-pointer bg-page/50 hover:bg-peach/10 transition text-center h-[178px]">
                   <UploadCloud className="w-8 h-8 text-sienna mb-2" />
                   <span className="text-xs font-bold text-ink">
                     {uploadedFileName ? uploadedFileName : 'Click to Upload PDF / Image / DOCX'}
@@ -669,7 +683,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   <select
                     value={targetSheetId}
                     onChange={(e) => setTargetSheetId(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-mist bg-fog text-ink text-xs font-medium focus:outline-none"
+                    className="w-full p-2.5 rounded-xl border border-subtle bg-page text-ink text-xs font-medium focus:outline-none"
                   >
                     {sheets.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -698,7 +712,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           {parseResult && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-300">
               {/* Pipeline Status Summary Card */}
-              <div className="steep-card-peach p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="tarazu-card bg-accent-subtle border-accent-primary p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-sienna text-paper flex items-center justify-center font-bold">
                     <CheckCircle2 className="w-6 h-6 text-peach" />
@@ -728,13 +742,13 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               {/* Two Column Output: Extracted Controls & Assets */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Extracted Controls */}
-                <div className="steep-card p-6 space-y-3">
-                  <div className="flex items-center justify-between pb-3 border-b border-mist">
+                <div className="tarazu-card p-6 space-y-3">
+                  <div className="flex items-center justify-between pb-3 border-b border-subtle">
                     <div>
                       <h3 className="text-xl font-bold text-ink">Extracted Security Controls</h3>
                       <p className="text-xs text-slate">Parsed clauses mapped to Tarazu control catalog</p>
                     </div>
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-fog border border-mist text-slate">
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-page border border-subtle text-slate">
                       {parseResult.extracted_controls.length} Controls
                     </span>
                   </div>
@@ -768,13 +782,13 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                 </div>
 
                 {/* Extracted Infrastructure Assets */}
-                <div className="steep-card p-6 space-y-3">
-                  <div className="flex items-center justify-between pb-3 border-b border-mist">
+                <div className="tarazu-card p-6 space-y-3">
+                  <div className="flex items-center justify-between pb-3 border-b border-subtle">
                     <div>
                       <h3 className="text-xl font-bold text-ink">Discovered Infrastructure Assets</h3>
                       <p className="text-xs text-slate">Extracted hostnames, cloud resources & databases</p>
                     </div>
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-fog border border-mist text-slate">
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-page border border-subtle text-slate">
                       {parseResult.extracted_assets.length} Assets
                     </span>
                   </div>
@@ -790,7 +804,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                             <span className="text-sienna font-medium">{asset.revenue_dependency_pct}% Rev Dep</span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-fog border border-mist text-slate uppercase">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-page border border-subtle text-slate uppercase">
                           {asset.criticality_tag}
                         </span>
                       </div>
@@ -800,11 +814,11 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               </div>
 
               {/* Parsed OCR Text Preview */}
-              <div className="steep-card p-6">
+              <div className="tarazu-card p-6">
                 <span className="text-xs font-bold text-slate uppercase tracking-wider block mb-2">
                   Raw Ingested Text Preview:
                 </span>
-                <pre className="p-4 rounded-2xl bg-fog border border-mist text-xs font-mono text-ink/80 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                <pre className="p-4 rounded-2xl bg-page border border-subtle text-xs font-mono text-ink/80 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
                   {parseResult.parsed_text}
                 </pre>
               </div>
@@ -817,7 +831,13 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           MODULE 2: CYBERRISK RAG ADVISORY ASSISTANT
          ══════════════════════════════════════════════════════════════════════ */}
       {activeModule === 'rag_advisor' && (
-        <div className="space-y-6">
+        <motion.div
+          key="rag_advisor"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="space-y-6"
+        >
           {/* Sub-Feature Navigation */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <button
@@ -825,7 +845,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               className={`px-4 py-2 text-xs font-semibold rounded-pill transition whitespace-nowrap ${
                 advisorSubTab === 'dpdp_calc'
                   ? 'bg-ink text-paper shadow-sm'
-                  : 'bg-fog border border-mist text-slate hover:text-ink'
+                  : 'bg-page border border-subtle text-slate hover:text-ink'
               }`}
             >
               DPDP Act 2023 Liability Calculator
@@ -838,7 +858,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               className={`px-4 py-2 text-xs font-semibold rounded-pill transition whitespace-nowrap ${
                 advisorSubTab === 'board_deck'
                   ? 'bg-ink text-paper shadow-sm'
-                  : 'bg-fog border border-mist text-slate hover:text-ink'
+                  : 'bg-page border border-subtle text-slate hover:text-ink'
               }`}
             >
               Interactive Board Deck Generator
@@ -851,7 +871,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               className={`px-4 py-2 text-xs font-semibold rounded-pill transition whitespace-nowrap ${
                 advisorSubTab === 'vendor_review'
                   ? 'bg-ink text-paper shadow-sm'
-                  : 'bg-fog border border-mist text-slate hover:text-ink'
+                  : 'bg-page border border-subtle text-slate hover:text-ink'
               }`}
             >
               Vendor Contract Review Agent
@@ -861,7 +881,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               className={`px-4 py-2 text-xs font-semibold rounded-pill transition whitespace-nowrap ${
                 advisorSubTab === 'chat'
                   ? 'bg-ink text-paper shadow-sm'
-                  : 'bg-fog border border-mist text-slate hover:text-ink'
+                  : 'bg-page border border-subtle text-slate hover:text-ink'
               }`}
             >
               Conversational CISO RAG Chat
@@ -870,8 +890,8 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
           {/* ── Sub-Feature 1: DPDP Act 2023 Liability Calculator ───────────── */}
           {advisorSubTab === 'dpdp_calc' && (
-            <div className="steep-card p-6 space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
+            <div className="tarazu-card p-6 space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-subtle">
                 <div>
                   <h3 className="text-2xl font-bold text-ink">
                     DPDP Act 2023 Statutory Liability Calculator
@@ -922,7 +942,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                       <select
                         value={dpdpSensitivity}
                         onChange={(e) => setDpdpSensitivity(e.target.value as any)}
-                        className="w-full p-2.5 rounded-xl border border-mist bg-fog text-ink font-medium focus:outline-none"
+                        className="w-full p-2.5 rounded-xl border border-subtle bg-page text-ink font-medium focus:outline-none"
                       >
                         <option value="standard">Standard Customer PII (Name, Email, Phone)</option>
                         <option value="financial">Financial Transaction & Account Records</option>
@@ -936,7 +956,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                       <select
                         value={dpdpIncidentType}
                         onChange={(e) => setDpdpIncidentType(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-mist bg-fog text-ink font-medium focus:outline-none"
+                        className="w-full p-2.5 rounded-xl border border-subtle bg-page text-ink font-medium focus:outline-none"
                       >
                         <option value="unauthorized_disclosure">Breach of Duty to take Reasonable Safeguards (Sec 8)</option>
                         <option value="dpbi_notification_failure">Failure to give Notice of Breach to Board (Sec 8(6))</option>
@@ -969,7 +989,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                               }
                             }}
                             className={`p-2.5 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                              active ? 'bg-peach/30 border-sienna text-sienna font-semibold' : 'bg-fog border-mist text-slate'
+                              active ? 'bg-peach/30 border-sienna text-sienna font-semibold' : 'bg-page border-subtle text-slate'
                             }`}
                           >
                             <span>{item.label}</span>
@@ -985,7 +1005,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
                 {/* Outputs & Guidance */}
                 <div className="space-y-4">
-                  <div className="steep-card-peach p-5 space-y-3">
+                  <div className="tarazu-card bg-accent-subtle border-accent-primary p-5 space-y-3">
                     <span className="text-xs font-bold text-sienna/80 uppercase tracking-wider block">
                       Assessed Statutory Liability
                     </span>
@@ -1004,7 +1024,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-fog border border-mist text-xs text-slate space-y-2">
+                  <div className="p-4 rounded-2xl bg-page border border-subtle text-xs text-slate space-y-2">
                     <span className="font-bold text-ink uppercase tracking-wider block text-[10px]">
                       Legal Defensibility Briefing:
                     </span>
@@ -1021,8 +1041,8 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
           {/* ── Sub-Feature 2: Interactive Board Deck Generator ─────────────── */}
           {advisorSubTab === 'board_deck' && (
-            <div className="steep-card p-6 space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
+            <div className="tarazu-card p-6 space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-subtle">
                 <div>
                   <h3 className="text-2xl font-bold text-ink">
                     Quantitative Board Risk Presentation Deck
@@ -1036,7 +1056,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   <select
                     value={boardAudience}
                     onChange={(e) => setBoardAudience(e.target.value as any)}
-                    className="p-2 rounded-pill border border-mist bg-fog text-xs font-semibold text-ink focus:outline-none"
+                    className="p-2 rounded-pill border border-subtle bg-page text-xs font-semibold text-ink focus:outline-none"
                   >
                     <option value="board_risk_committee">Board Risk Committee</option>
                     <option value="audit_committee">Audit Committee</option>
@@ -1064,7 +1084,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                         className={`px-4 py-2 text-xs font-semibold rounded-pill transition whitespace-nowrap flex items-center gap-2 ${
                           activeSlideIndex === idx
                             ? 'bg-sienna text-paper shadow-sm'
-                            : 'bg-fog border border-mist text-slate hover:text-ink'
+                            : 'bg-page border border-subtle text-slate hover:text-ink'
                         }`}
                       >
                         <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">
@@ -1077,8 +1097,8 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
                   {/* Active Slide Canvas Presentation View */}
                   {boardDeckData.slides[activeSlideIndex] && (
-                    <div className="p-8 rounded-3xl bg-paper border border-sienna/20 shadow-soft space-y-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-mist">
+                    <div className="p-8 rounded-3xl bg-surface border border-sienna/20 shadow-soft space-y-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-subtle">
                         <div>
                           <span className="text-[10px] uppercase font-bold tracking-widest text-sienna">
                             Slide {boardDeckData.slides[activeSlideIndex].slide_number} of {boardDeckData.slides.length}
@@ -1090,7 +1110,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                             {boardDeckData.slides[activeSlideIndex].subtitle}
                           </p>
                         </div>
-                        <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-fog border border-mist text-slate">
+                        <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-page border border-subtle text-slate">
                           {boardDeckData.organization} · {boardDeckData.date}
                         </span>
                       </div>
@@ -1098,7 +1118,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                       {/* Slide KPIs */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {boardDeckData.slides[activeSlideIndex].kpis.map((kpi: any, i: number) => (
-                          <div key={i} className="p-4 rounded-2xl bg-fog border border-mist">
+                          <div key={i} className="p-4 rounded-2xl bg-page border border-subtle">
                             <span className="text-[11px] uppercase font-bold text-slate block mb-1">
                               {kpi.label}
                             </span>
@@ -1127,8 +1147,8 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
           {/* ── Sub-Feature 3: Vendor Contract Review Agent ─────────────────── */}
           {advisorSubTab === 'vendor_review' && (
-            <div className="steep-card p-6 space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mist">
+            <div className="tarazu-card p-6 space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-subtle">
                 <div>
                   <h3 className="text-2xl font-bold text-ink">
                     Vendor Contract Review Agent
@@ -1142,7 +1162,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   <select
                     value={selectedVendorPreset}
                     onChange={(e) => setSelectedVendorPreset(e.target.value)}
-                    className="p-2 rounded-pill border border-mist bg-fog text-xs font-semibold text-ink focus:outline-none"
+                    className="p-2 rounded-pill border border-subtle bg-page text-xs font-semibold text-ink focus:outline-none"
                   >
                     <option value="cloudcore">CloudCore Technologies (API Switch)</option>
                     <option value="finsoft">FinSoft Banking Technologies (CBS Vendor)</option>
@@ -1161,7 +1181,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               {vendorReviewResult && (
                 <div className="space-y-6">
                   {/* Score & Verdict Banner */}
-                  <div className="p-6 rounded-3xl bg-fog border border-mist flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="p-6 rounded-3xl bg-page border border-subtle flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-2xl bg-peach text-sienna flex items-center justify-center text-3xl font-bold shrink-0">
                         {vendorReviewResult.contract_security_score}
@@ -1182,7 +1202,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   </div>
 
                   {/* Findings Breakdown Table */}
-                  <div className="steep-card p-6 space-y-3">
+                  <div className="tarazu-card p-6 space-y-3">
                     <h4 className="text-xl font-bold text-ink">Statutory Compliance Findings & Required Amendments</h4>
                     <div className="divide-y divide-mist">
                       {vendorReviewResult.findings.map((f: any, idx: number) => (
@@ -1211,8 +1231,8 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
 
           {/* ── Sub-Feature 4: Conversational CISO RAG Chat ─────────────────── */}
           {advisorSubTab === 'chat' && (
-            <div className="steep-card p-6 space-y-4">
-              <div className="pb-3 border-b border-mist">
+            <div className="tarazu-card p-6 space-y-4">
+              <div className="pb-3 border-b border-subtle">
                 <h3 className="text-2xl font-bold text-ink">
                   Conversational CISO RAG Advisor
                 </h3>
@@ -1234,7 +1254,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                     onClick={() => {
                       setChatInput(prompt);
                     }}
-                    className="px-3 py-1 rounded-pill bg-fog border border-mist text-[11px] text-slate hover:text-ink hover:bg-mist/80 transition"
+                    className="px-3 py-1 rounded-pill bg-page border border-subtle text-[11px] text-slate hover:text-ink hover:bg-mist/80 transition"
                   >
                     {prompt}
                   </button>
@@ -1242,7 +1262,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               </div>
 
               {/* Message Feed */}
-              <div className="p-4 rounded-3xl bg-fog border border-mist space-y-4 min-h-[340px] max-h-[460px] overflow-y-auto">
+              <div className="p-4 rounded-3xl bg-page border border-subtle space-y-4 min-h-[340px] max-h-[460px] overflow-y-auto">
                 {chatMessages.map((msg, idx) => (
                   <div
                     key={idx}
@@ -1252,12 +1272,12 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                       className={`max-w-2xl p-4 rounded-3xl text-xs leading-relaxed ${
                         msg.sender === 'user'
                           ? 'bg-ink text-paper rounded-br-none'
-                          : 'bg-white text-ink border border-mist rounded-bl-none shadow-sm'
+                          : 'bg-white text-ink border border-subtle rounded-bl-none shadow-sm'
                       }`}
                     >
                       <p>{msg.text}</p>
                       {msg.citations && msg.citations.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-mist/60 text-[10px] text-slate space-y-0.5">
+                        <div className="mt-2.5 pt-2 border-t border-subtle/60 text-[10px] text-slate space-y-0.5">
                           <span className="font-bold text-sienna uppercase tracking-wider block">Statutory Grounding:</span>
                           {msg.citations.map((c, i) => (
                             <div key={i} className="flex items-center gap-1.5">
@@ -1285,7 +1305,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   placeholder="Ask any CISO risk, FAIR quantification, or DPDP compliance question..."
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  className="flex-1 p-3 rounded-pill border border-mist bg-fog text-xs font-medium text-ink focus:outline-none focus:border-sienna"
+                  className="flex-1 p-3 rounded-pill border border-subtle bg-page text-xs font-medium text-ink focus:outline-none focus:border-sienna"
                 />
                 <button
                   type="submit"
@@ -1298,8 +1318,9 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               </form>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 };

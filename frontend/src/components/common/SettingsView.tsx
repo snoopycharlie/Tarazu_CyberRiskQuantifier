@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   User, Mail, Building2, Palette, LayoutDashboard, Bell,
-  Database, Shield, LogOut, ChevronRight, Check, Monitor,
+  Database, Shield, LogOut, Check, Monitor,
   Sun, Moon, RefreshCw, Info, Clock, Globe
 } from 'lucide-react';
 import { DemoUser, authLogout } from '../../utils/auth';
@@ -13,6 +14,7 @@ import {
   loadSettings,
   saveSettings,
 } from '../../utils/settings';
+import { containerVariants, itemVariants } from '../../utils/animations';
 
 interface SettingsViewProps {
   currentUser: DemoUser | null;
@@ -47,7 +49,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
   };
 
   const handleResetDemo = () => {
-    if (confirm('Reset all application preferences to defaults?')) {
+    if (window.confirm('Reset all application preferences to defaults?')) {
       localStorage.removeItem(SETTINGS_KEY);
       setSettings(DEFAULT_SETTINGS);
       document.documentElement.classList.remove('dark');
@@ -59,36 +61,47 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
     : 'Unknown';
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300 max-w-2xl">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-8 max-w-2xl"
+    >
       {/* Header */}
-      <div>
-        <span className="text-xs font-semibold text-slate uppercase tracking-widest block mb-1">
+      <motion.div variants={itemVariants}>
+        <span className="page-eyebrow block mb-1">
           Preferences
         </span>
-        <h1 className="text-4xl font-bold text-ink tracking-tight">Settings</h1>
-        <p className="text-slate text-base mt-1">
+        <h1 className="text-4xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Settings</h1>
+        <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>
           Manage your profile, appearance, and application preferences.
         </p>
-      </div>
+      </motion.div>
 
       {/* Save flash */}
       {savedFlash && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald/10 border border-emerald/20 text-emerald text-xs font-semibold w-fit animate-in fade-in duration-150">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold w-fit"
+          style={{ background: 'var(--risk-low-bg)', border: '1px solid var(--risk-low-border)', color: 'var(--risk-low)' }}
+        >
           <Check className="w-3.5 h-3.5" />
           <span>Settings saved</span>
-        </div>
+        </motion.div>
       )}
 
       {/* Profile */}
-      <section className="tarazu-card p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-mist">
-          <User className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">Profile</h2>
+      <motion.section variants={itemVariants} className="tarazu-card p-6 space-y-4">
+        <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <User className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Profile</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-1.5">
+            <label className="section-label block mb-1.5">
               Display Name
             </label>
             <input
@@ -96,75 +109,75 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
               value={settings.userName || currentUser?.name || ''}
               onChange={(e) => update({ userName: e.target.value })}
               placeholder={currentUser?.name || 'Your name'}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-mist bg-fog text-ink text-sm font-medium focus:outline-none focus:border-sienna/50 transition"
+              className="cyber-input"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-1.5">
+            <label className="section-label block mb-1.5">
               Email
             </label>
             <input
               type="email"
               value={currentUser?.email || ''}
               readOnly
-              className="w-full px-3.5 py-2.5 rounded-xl border border-mist bg-fog text-slate text-sm font-medium cursor-not-allowed"
+              className="cyber-input opacity-70 cursor-not-allowed"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-1.5">
+            <label className="section-label block mb-1.5">
               Role
             </label>
             <input
               type="text"
               value={currentUser?.role || ''}
               readOnly
-              className="w-full px-3.5 py-2.5 rounded-xl border border-mist bg-fog text-slate text-sm font-medium cursor-not-allowed"
+              className="cyber-input opacity-70 cursor-not-allowed"
             />
           </div>
           <div>
-            <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-1.5">
+            <label className="section-label block mb-1.5">
               Organization
             </label>
             <input
               type="text"
               value={currentUser?.org || ''}
               readOnly
-              className="w-full px-3.5 py-2.5 rounded-xl border border-mist bg-fog text-slate text-sm font-medium cursor-not-allowed"
+              className="cyber-input opacity-70 cursor-not-allowed"
             />
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Appearance & Language */}
-      <section className="tarazu-card p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-mist">
-          <Palette className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">{t('settings.appearance')}</h2>
+      <motion.section variants={itemVariants} className="tarazu-card p-6 space-y-4">
+        <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <Palette className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{t('settings.appearance')}</h2>
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-3">
+          <label className="section-label block mb-3">
             {t('settings.language')}
           </label>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setLang('en')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition ${
-                lang === 'en'
-                  ? 'bg-ink text-paper border-ink'
-                  : 'bg-fog border-mist text-slate hover:text-ink hover:border-slate/40'
-              }`}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition"
+              style={lang === 'en'
+                ? { background: 'var(--accent-primary)', borderColor: 'var(--accent-primary)', color: '#ffffff' }
+                : { background: 'var(--bg-surface)', borderColor: 'var(--border-strong)', color: 'var(--text-secondary)' }
+              }
             >
               <Globe className="w-4 h-4" />
               <span>{t('settings.english')}</span>
             </button>
             <button
               onClick={() => setLang('hi')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition ${
-                lang === 'hi'
-                  ? 'bg-ink text-paper border-ink'
-                  : 'bg-fog border-mist text-slate hover:text-ink hover:border-slate/40'
-              }`}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition"
+              style={lang === 'hi'
+                ? { background: 'var(--accent-primary)', borderColor: 'var(--accent-primary)', color: '#ffffff' }
+                : { background: 'var(--bg-surface)', borderColor: 'var(--border-strong)', color: 'var(--text-secondary)' }
+              }
             >
               <Globe className="w-4 h-4" />
               <span>{t('settings.hindi')}</span>
@@ -173,7 +186,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-3">
+          <label className="section-label block mb-3">
             Color Theme
           </label>
           <div className="flex items-center gap-3">
@@ -184,24 +197,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
               <button
                 key={value}
                 onClick={() => update({ theme: value })}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition ${
-                  settings.theme === value
-                    ? 'bg-ink text-paper border-ink'
-                    : 'bg-fog border-mist text-slate hover:text-ink hover:border-slate/40'
-                }`}
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold transition"
+                style={settings.theme === value
+                  ? { background: 'var(--accent-primary)', borderColor: 'var(--accent-primary)', color: '#ffffff' }
+                  : { background: 'var(--bg-surface)', borderColor: 'var(--border-strong)', color: 'var(--text-secondary)' }
+                }
               >
                 <Icon className="w-4 h-4" />
                 <span>{label}</span>
               </button>
             ))}
           </div>
-          <p className="text-xs text-slate mt-2">
+          <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
             Dark mode applies immediately and persists across sessions.
           </p>
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-3">
+          <label className="section-label block mb-3">
             Display Density
           </label>
           <div className="flex items-center gap-3">
@@ -212,34 +225,34 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
               <button
                 key={value}
                 onClick={() => update({ density: value })}
-                className={`flex-1 py-2.5 rounded-xl border text-sm font-semibold transition ${
-                  settings.density === value
-                    ? 'bg-ink text-paper border-ink'
-                    : 'bg-fog border-mist text-slate hover:text-ink'
-                }`}
+                className="flex-1 py-2.5 rounded-xl border text-sm font-semibold transition"
+                style={settings.density === value
+                  ? { background: 'var(--accent-primary)', borderColor: 'var(--accent-primary)', color: '#ffffff' }
+                  : { background: 'var(--bg-surface)', borderColor: 'var(--border-strong)', color: 'var(--text-secondary)' }
+                }
               >
                 {label}
               </button>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Dashboard Preferences */}
-      <section className="tarazu-card p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-mist">
-          <LayoutDashboard className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">Dashboard</h2>
+      <motion.section variants={itemVariants} className="tarazu-card p-6 space-y-4">
+        <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <LayoutDashboard className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Dashboard</h2>
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-slate uppercase tracking-wider block mb-2">
+          <label className="section-label block mb-2">
             Default Landing Page
           </label>
           <select
             value={settings.defaultPage}
             onChange={(e) => update({ defaultPage: e.target.value })}
-            className="w-full px-3.5 py-2.5 rounded-xl border border-mist bg-fog text-ink text-sm font-medium focus:outline-none focus:border-sienna/50 transition"
+            className="cyber-select"
           >
             <option value="dashboard">Overview (Recommended)</option>
             <option value="pillar1">Risk by Business Size</option>
@@ -248,13 +261,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
             <option value="compliance">Compliance</option>
           </select>
         </div>
-      </section>
+      </motion.section>
 
       {/* Notifications */}
-      <section className="tarazu-card p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-mist">
-          <Bell className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">Notifications</h2>
+      <motion.section variants={itemVariants} className="tarazu-card p-6 space-y-4">
+        <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <Bell className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Notifications</h2>
         </div>
 
         <div className="space-y-3">
@@ -263,38 +276,45 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
             { key: 'complianceAlerts', label: 'Compliance Alerts', desc: 'Notify when compliance gaps are detected' },
             { key: 'recommendationAlerts', label: 'Recommendation Alerts', desc: 'Notify when new security improvements are available' },
           ] as const).map(({ key, label, desc }) => (
-            <label key={key} className="flex items-center justify-between p-3 rounded-xl bg-fog border border-mist cursor-pointer hover:bg-mist/60 transition">
+            <label
+              key={key}
+              className="flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors"
+              style={{ background: 'var(--bg-surface-hover)', borderColor: 'var(--border-subtle)' }}
+            >
               <div>
-                <div className="text-sm font-semibold text-ink">{label}</div>
-                <div className="text-xs text-slate mt-0.5">{desc}</div>
+                <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{label}</div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{desc}</div>
               </div>
               <div
                 onClick={() => update({ [key]: !settings[key] } as any)}
-                className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ml-4 cursor-pointer ${
-                  settings[key] ? 'bg-sienna' : 'bg-slate/30'
-                }`}
+                className="w-11 h-6 rounded-full transition-colors relative shrink-0 ml-4 cursor-pointer"
+                style={{ background: settings[key] ? 'var(--accent-primary)' : 'var(--bg-elevated)', border: `1px solid ${settings[key] ? 'transparent' : 'var(--border-strong)'}` }}
               >
                 <div
-                  className={`w-5 h-5 rounded-full bg-white transition-transform transform absolute top-0.5 ${
-                    settings[key] ? 'translate-x-5' : 'translate-x-0.5'
+                  className={`w-5 h-5 rounded-full bg-white transition-transform transform absolute ${
+                    settings[key] ? 'translate-x-5' : 'translate-x-0'
                   }`}
+                  style={{ top: '1px', left: '1px', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }}
                 />
               </div>
             </label>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Demo Utilities */}
-      <section className="tarazu-card p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-mist">
-          <Database className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">Demo Utilities</h2>
+      <motion.section variants={itemVariants} className="tarazu-card p-6 space-y-4">
+        <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <Database className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Demo Utilities</h2>
         </div>
 
-        <div className="p-3 rounded-xl bg-peach/30 border border-sienna/20 flex items-start gap-2">
-          <Info className="w-4 h-4 text-sienna shrink-0 mt-0.5" />
-          <p className="text-xs text-sienna/80 leading-relaxed">
+        <div
+          className="p-3 rounded-xl flex items-start gap-2"
+          style={{ background: 'var(--accent-subtle)', border: '1px solid var(--accent-primary)' }}
+        >
+          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--accent-primary)' }} />
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             This application runs in demo mode with sample data for Suraksha Finance Ltd (BFSI · Mid-tier). 
             Demo data persists automatically. Use the options below to reset if needed.
           </p>
@@ -302,32 +322,43 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
 
         <button
           onClick={handleResetDemo}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-fog border border-mist text-sm font-semibold text-ink hover:bg-mist transition"
+          className="btn-secondary"
         >
-          <RefreshCw className="w-4 h-4 text-sienna" />
+          <RefreshCw className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
           <span>Reset Application Preferences</span>
         </button>
-      </section>
+      </motion.section>
 
       {/* Session & Security */}
-      <section className="tarazu-card p-6 space-y-4">
-        <div className="flex items-center gap-2 pb-4 border-b border-mist">
-          <Shield className="w-4 h-4 text-sienna" />
-          <h2 className="text-lg font-bold text-ink">Session & Security</h2>
+      <motion.section variants={itemVariants} className="tarazu-card p-6 space-y-4">
+        <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <Shield className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+          <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Session & Security</h2>
         </div>
 
         <div className="space-y-3 text-sm">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-fog border border-mist">
+          <div
+            className="flex items-center justify-between p-3 rounded-xl border"
+            style={{ background: 'var(--bg-surface-hover)', borderColor: 'var(--border-subtle)' }}
+          >
             <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-slate" />
+              <Mail className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
               <div>
-                <div className="font-semibold text-ink text-xs">Signed in as</div>
-                <div className="text-slate text-xs">{currentUser?.email || 'Unknown'}</div>
+                <div className="font-semibold text-xs" style={{ color: 'var(--text-primary)' }}>Signed in as</div>
+                <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>{currentUser?.email || 'Unknown'}</div>
               </div>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald/10 text-emerald font-semibold">Active</span>
+            <span
+              className="text-xs px-2 py-0.5 rounded-full font-semibold"
+              style={{ background: 'var(--risk-low-bg)', color: 'var(--risk-low)' }}
+            >
+              Active
+            </span>
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-fog border border-mist text-xs text-slate">
+          <div
+            className="flex items-center gap-2 p-3 rounded-xl border text-xs"
+            style={{ background: 'var(--bg-surface-hover)', borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}
+          >
             <Clock className="w-4 h-4" />
             <span>Session started: {loginTime}</span>
           </div>
@@ -335,12 +366,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-crimson/10 border border-crimson/20 text-crimson text-sm font-semibold hover:bg-crimson/20 transition w-full justify-center"
+          className="btn-danger w-full mt-2"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
         </button>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 };
