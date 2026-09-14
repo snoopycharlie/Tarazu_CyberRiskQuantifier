@@ -951,3 +951,107 @@ async def seed_healthcare_org(db: AsyncSession) -> Organization:
     logger.info("Seeded Aarogya Hospitals Ltd: org=%s, sheets=%d, assets=%d",
                 org.id, len(sheets), sum(len(v) for v in all_sheet_assets.values()))
     return org
+
+
+async def seed_small_business_org(db: AsyncSession) -> Organization:
+    """Seeds a small business (e.g., local bakery) to test the application's scale-sensitivity."""
+    existing = await db.execute(select(Organization).where(Organization.name == "FreshBites Local Bakery"))
+    existing_org = existing.scalars().first()
+    if existing_org:
+        return existing_org
+
+    org = Organization(
+        name="FreshBites Local Bakery",
+        sector="Retail & Hospitality",
+        size_tier="micro",
+        employee_count=15,
+        annual_revenue_inr=25000000.0, # 2.5 Cr
+    )
+    db.add(org)
+    await db.flush()
+
+    # Create one simple sheet
+    store_infra = Sheet(org_id=org.id, name="Store & IT Infrastructure", type="corporate_it")
+    db.add(store_infra)
+    await db.flush()
+
+    # Create controls
+    controls_data = [
+        ("Wi-Fi WPA2", "partial", 500.0),
+        ("Basic Antivirus", "present", 2000.0),
+        ("CCTV Monitoring", "present", 15000.0),
+        ("Cloud Backup", "absent", 5000.0),
+        ("Admin MFA", "absent", 0.0),
+    ]
+    controls = []
+    for name, status, cost in controls_data:
+        c = Control(org_id=org.id, name=name, description=f"{name} implementation", category="Technical",
+                    framework_clause_refs=["NIST_CSF"], status=status, cost_inr=cost)
+        db.add(c)
+        controls.append(c)
+    await db.flush()
+    
+    # Create assets
+    assets_data = [
+        {"name": "POS Terminal (Front Desk)", "asset_type": "Workstation", "criticality_tag": "payment_processing", "rev_dep": 90.0, "vulns": [{"cve_id": "CVE-MISC-POS", "cvss": 7.5, "desc": "Outdated POS software", "days": 120}]},
+        {"name": "Store Wi-Fi Router", "asset_type": "Network Device", "criticality_tag": "standard", "rev_dep": 30.0, "vulns": [{"cve_id": "CVE-MISC-WIFI", "cvss": 5.0, "desc": "Default admin password", "days": 300}]},
+        {"name": "Payment Gateway Link", "asset_type": "Web App", "criticality_tag": "payment_processing", "rev_dep": 85.0, "vulns": []},
+        {"name": "Owner Laptop", "asset_type": "Workstation", "criticality_tag": "admin_workstation", "rev_dep": 10.0, "vulns": [{"cve_id": "CVE-MISC-PHISH", "cvss": 8.5, "desc": "Susceptible to phishing", "days": 60}]},
+        {"name": "CCTV Camera System", "asset_type": "Network Device", "criticality_tag": "standard", "rev_dep": 0.0, "vulns": [{"cve_id": "CVE-MISC-CAM", "cvss": 6.0, "desc": "Unpatched firmware", "days": 400}]},
+        {"name": "Cloud Accounting (Zoho)", "asset_type": "Cloud Service", "criticality_tag": "core_db", "rev_dep": 5.0, "vulns": []},
+        {"name": "Inventory Tablet", "asset_type": "Workstation", "criticality_tag": "standard", "rev_dep": 10.0, "vulns": []},
+        {"name": "Website (WordPress)", "asset_type": "Web App", "criticality_tag": "customer_portal", "rev_dep": 15.0, "vulns": [{"cve_id": "CVE-WP-PLUGIN", "cvss": 7.0, "desc": "Vulnerable plugin", "days": 90}]},
+    ]
+    
+    sheet_assets = []
+    for ad in assets_data:
+        asset = Asset(
+            sheet_id=store_infra.id, name=ad["name"], asset_type=ad["asset_type"],
+            criticality_tag=ad["criticality_tag"], revenue_dependency_pct=ad["rev_dep"],
+            metadata_json={}
+        )
+        db.add(asset)
+        await db.flush()
+        sheet_assets.append(asset)
+        for vd in ad.get("vulns", []):
+            db.add(Vulnerability(
+                asset_id=asset.id, cve_id=vd.get("cve_id"), cvss_score=vd.get("cvss"),
+                description=vd.get("desc", ""), days_unpatched=vd.get("days", 0), source="cve_match",
+            ))
+    
+    # Dependencies
+    asset_dict = {a.name: a.id for a in sheet_assets}
+    edges = [
+        ("POS Terminal (Front Desk)", "Payment Gateway Link", "strong"),
+        ("POS Terminal (Front Desk)", "Store Wi-Fi Router", "strong"),
+        ("Inventory Tablet", "Store Wi-Fi Router", "moderate"),
+        ("Owner Laptop", "Store Wi-Fi Router", "moderate"),
+        ("Owner Laptop", "Cloud Accounting (Zoho)", "strong"),
+        ("CCTV Camera System", "Store Wi-Fi Router", "strong"),
+        ("Website (WordPress)", "Payment Gateway Link", "weak"),
+    ]
+    for src, tgt, strength in edges:
+        db.add(GraphEdge(sheet_id=store_infra.id, source_asset_id=asset_dict[src], target_asset_id=asset_dict[tgt], dependency_strength=strength))
+
+    # Calculate risks
+    controls_dicts = [{"id": c.id, "name": c.name, "status": c.status, "framework_clause_refs": c.framework_clause_refs} for c in controls]
+    ctx_controls = ControlsContext.from_control_list(controls_dicts)
+    ctx_org = OrgContext(sector=org.sector, size_tier=org.size_tier, employee_count=org.employee_count, annual_revenue_inr=org.annual_revenue_inr)
+    
+    total_eal = 0.0
+    traces = []
+    for a in sheet_assets:
+        vr = await db.execute(select(Vulnerability).where(Vulnerability.asset_id == a.id))
+        vs = vr.scalars().all()
+        vcs = [VulnContext(cvss_score=v.cvss_score, days_unpatched=v.days_unpatched, cve_id=v.cve_id, description=v.description) for v in vs]
+        ac = AssetContext(name=a.name, asset_type=a.asset_type, criticality_tag=a.criticality_tag, revenue_dependency_pct=a.revenue_dependency_pct)
+        out = compute_asset_risk(ctx_org, ac, vcs, ctx_controls)
+        db.add(RiskScore(asset_id=a.id, sheet_id=store_infra.id, expected_annual_loss_inr=out.expected_annual_loss_inr, rule_trace=out.as_dict_trace(), ai_mode="rules_only"))
+        total_eal += out.expected_annual_loss_inr
+        traces.extend(out.as_dict_trace())
+    
+    db.add(RiskScore(sheet_id=store_infra.id, asset_id=None, expected_annual_loss_inr=round(total_eal, 2), rule_trace=traces[:15], ai_mode="rules_only"))
+    
+    await db.flush()
+    logger.info("Seeded FreshBites Local Bakery: org=%s, assets=%d", org.id, len(sheet_assets))
+    return org

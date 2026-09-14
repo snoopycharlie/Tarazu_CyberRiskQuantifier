@@ -326,10 +326,23 @@ class DashboardSummary(BaseModel):
 
 # ── What-If ───────────────────────────────────────────────────────────────────
 
+class ScenarioChange(BaseModel):
+    change_type: str  # "asset_availability", "metric_shift", "control_toggle", "global_vuln_shift", "incident_response_shift", "vendor_risk_shift", "access_control_shift"
+    target_id: Optional[str] = None
+    value_str: Optional[str] = None
+    value_num: Optional[float] = None
+
 class WhatIfRequest(BaseModel):
     org_id: str
+    scenario_id: str = "custom"
+    changes: list[ScenarioChange] = []
+    # Legacy fields
     sheet_id: Optional[str] = None
-    toggled_controls: dict[str, str]  # {control_id: "present"|"absent"|"partial"}
+    toggled_controls: dict[str, str] = {}
+    scenario_type: Optional[str] = None
+    target_id: Optional[str] = None
+    target_state: Optional[str] = None
+    numeric_shift: Optional[float] = None
 
 
 class WhatIfResult(BaseModel):
@@ -348,6 +361,22 @@ class WhatIfResult(BaseModel):
     period_eal_display: Optional[MoneyDisplay] = None
     period_delta_inr: Optional[float] = None
     period_delta_display: Optional[MoneyDisplay] = None
+
+    # New fields for Downtime/Blast Radius scenarios
+    affected_assets_count: Optional[int] = None
+    downstream_impact_inr: Optional[float] = None
+    downstream_impact_display: Optional[MoneyDisplay] = None
+    blast_radius_result: Optional[BlastRadiusResult] = None
+    
+    # New fields for Rich Statistics and Visualization
+    affected_assets_total: Optional[int] = None
+    affected_assets_critical: Optional[int] = None
+    revenue_change_inr: Optional[float] = None
+    revenue_change_display: Optional[MoneyDisplay] = None
+    cost_change_inr: Optional[float] = None
+    cost_change_display: Optional[MoneyDisplay] = None
+    risk_distribution_before: Optional[dict[str, int]] = None  # e.g., {"critical": 2, "high": 5, "medium": 10, "low": 20}
+    risk_distribution_after: Optional[dict[str, int]] = None
 
 
 # ── Demo Comparison ───────────────────────────────────────────────────────────

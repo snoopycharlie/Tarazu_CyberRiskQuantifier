@@ -41,7 +41,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
   const [activeModule, setActiveModule] = useState<'document_parsing' | 'rag_advisor'>('document_parsing');
 
   // ──────────────────────────────────────────────────────────────────────────
-  // MODULE 1: AUTOMATED DOCUMENT INGESTION & POLICY PARSING STATE
+  // MODULE 1: AUTOMATED DOCUMENT READER & DATA COLLECTION
   // ──────────────────────────────────────────────────────────────────────────
   const [parseMode, setParseMode] = useState<'policy_ocr' | 'soc2_extract' | 'diagram_scan'>('policy_ocr');
   const [selectedPreset, setSelectedPreset] = useState<string>('rbi_nbfc_cyber_policy');
@@ -53,7 +53,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
   const [committedSuccess, setCommittedSuccess] = useState<boolean>(false);
 
   // ──────────────────────────────────────────────────────────────────────────
-  // MODULE 2: CYBERRISK RAG ADVISORY ASSISTANT STATE
+  // MODULE 2: AI SECURITY ADVISOR STATE
   // ──────────────────────────────────────────────────────────────────────────
   const [advisorSubTab, setAdvisorSubTab] = useState<'dpdp_calc' | 'board_deck' | 'vendor_review' | 'chat'>('dpdp_calc');
 
@@ -82,7 +82,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'assistant'; text: string; citations?: string[] }>>([
     {
       sender: 'assistant',
-      text: `Hello! I am your CyberRisk RAG Advisory Assistant for ${currentOrg?.name || 'Suraksha Finance Ltd'}. Grounded in live FAIR financial telemetry, the Indian DPDP Act 2023, and RBI Cyber Security circulars, how may I assist your risk committee today?`,
+      text: `Hello! I am your AI Security Assistant for ${currentOrg?.name || 'Suraksha Finance Ltd'}. Grounded in your live security metrics, data protection laws, and regulatory guidelines, how may I assist your team today?`,
       citations: [
         'Digital Personal Data Protection Act 2023 (Section 8 & 33)',
         'RBI Master Direction — Cyber Security Framework for NBFCs',
@@ -124,7 +124,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
       // Resilient fallback parser
       const fallbackPresetData: Record<string, any> = {
         rbi_nbfc_cyber_policy: {
-          pipeline_mode: 'PDF Security Policy OCR',
+          pipeline_mode: 'PDF Security Policy Reader',
           filename: 'Suraksha NBFC Master Information Security Policy (Rev 4.2).pdf',
           ocr_confidence: 0.96,
           total_controls_found: 5,
@@ -167,7 +167,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           ocr_confidence: 0.95,
           total_controls_found: 3,
           total_assets_found: 5,
-          parsed_text: `[Visual OCR & Topology Extraction Output]\nDetected Topology:\n- AWS ap-south-1 (Mumbai) Region\n- Public Subnet: Cloudflare CDN -> Kong API Gateway (Port 443) -> Network Load Balancer\n- Private Subnet: EKS Worker Nodes (12 Pods) -> Redis Cache Cluster (ElastiCache)\n- Isolated Subnet: Amazon Aurora PostgreSQL DB (Multi-AZ) & HashiCorp Vault Secrets Manager\n- CI/CD Layer: Jenkins EC2 instance connected via VPC Peering to Production VPC`,
+          parsed_text: `[Visual Document Reader & Topology Extraction Output]\nDetected Topology:\n- AWS ap-south-1 (Mumbai) Region\n- Public Subnet: Cloudflare CDN -> Kong API Gateway (Port 443) -> Network Load Balancer\n- Private Subnet: EKS Worker Nodes (12 Pods) -> Redis Cache Cluster (ElastiCache)\n- Isolated Subnet: Amazon Aurora PostgreSQL DB (Multi-AZ) & HashiCorp Vault Secrets Manager\n- CI/CD Layer: Jenkins EC2 instance connected via VPC Peering to Production VPC`,
           extracted_controls: [
             { name: 'Network Segmentation & VLAN Isolation', status: 'present', clause_ref: 'AWS VPC Subnets', confidence: 0.95, recommendation: 'Three-tier subnet isolation detected' },
             { name: 'Firewall & Perimeter Defense', status: 'present', clause_ref: 'Security Groups', confidence: 0.92, recommendation: 'Strict port 443 ingress rules verified' },
@@ -296,7 +296,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           },
           {
             slide_number: 3,
-            title: 'Lateral Movement & Cascading Blast Radius',
+            title: 'Lateral Movement & Cascading Impact',
             subtitle: 'Inter-Segment Contagion Vector Analysis',
             kpis: [
               { label: 'Contagion Pathway', value: 'HR Laptop → VPN → Core Banking', status: 'critical' },
@@ -448,9 +448,9 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
       if (lower.includes('dpdp') || lower.includes('penalty') || lower.includes('fine')) {
         simulatedReply = `Under the Digital Personal Data Protection (DPDP) Act 2023, Section 33 and the Schedule prescribe a statutory ceiling of up to ₹250 Crore for failure to implement reasonable security safeguards. For ${currentOrg?.name || 'Suraksha Finance Ltd'}, given your current monitored customer database of ~75,000 PII records, an unmitigated breach presents an adjudicated liability exposure between ₹8.5 Cr and ₹15.2 Cr. Implementing encryption at rest and MFA on admin accounts provides statutory mitigating factors under Section 33(2).`;
       } else if (lower.includes('blast') || lower.includes('lateral') || lower.includes('vpn')) {
-        simulatedReply = `According to your live graph topology in the Pillar 2 Blast Radius Engine, your primary contagion pathway originates from corporate endpoints: HR Laptop → FortiGate Corporate VPN Gateway → Core Finacle Application Server. This exposes ₹2.57 Crore in downstream transactional value. Deploying network micro-segmentation and ZTNA suppresses this lateral pathway completely.`;
+        simulatedReply = `According to your live Impact Map, your primary risk pathway originates from corporate endpoints: HR Laptop → FortiGate Corporate VPN Gateway → Core Finacle Application Server. This exposes ₹2.57 Crore in downstream transactional value. Deploying network micro-segmentation and Zero Trust access blocks this pathway completely.`;
       } else if (lower.includes('board') || lower.includes('ciso') || lower.includes('recommend') || lower.includes('budget')) {
-        simulatedReply = `For the upcoming Board Risk Committee, your quantitative business case should prioritize the Knapsack ROSI Portfolio: requesting ₹49.0 Lakh CapEx for Endpoint Detection and Response (EDR) and Immutable Airgapped Backups. This intervention yields ₹2.15 Crore in annualized loss reduction, delivering an efficiency ratio of 4.4x return on security investment.`;
+        simulatedReply = `For the upcoming Risk Committee meeting, your investment plan should prioritize Endpoint Detection and Response (EDR) and Immutable Airgapped Backups for ₹49.0 Lakh. This yields ₹2.15 Crore in annualized loss reduction, delivering a 4.4x return on security investment.`;
       } else {
         simulatedReply = `Based on ${currentOrg?.name || 'Suraksha Finance Ltd'}'s current security telemetry (Total EAL: ₹2.44 Cr across 32 assets; RBI CSF readiness: 60.0%), our primary supervisory risk is the 4 unaddressed gaps in privileged access and immutable backups. Under RBI Circulars, failure to maintain airgapped backups exposes the firm to potential operational suspension. Immediate remediation of CVE-2021-44228 on the Payment switch is advised.`;
       }
@@ -491,11 +491,11 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <span className="text-xs text-slate">Operational Modules</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-ink tracking-tight">
-            Document Ingestion & RAG Advisory
+            Data Collection & AI Assistant
           </h1>
           <p className="text-slate text-base mt-2 max-w-3xl">
-            Fully implemented production capabilities: automated multi-modal document parsing for policy and audit extraction,
-            paired with conversational CISO RAG intelligence grounded in the Indian DPDP Act 2023 and RBI regulatory circulars.
+            Fully implemented production capabilities: automated document reading for policy and audit extraction,
+            paired with conversational AI intelligence grounded in data protection laws and regulatory guidelines.
           </p>
         </div>
 
@@ -510,7 +510,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             }`}
           >
             <FileUp className="w-4 h-4 text-peach" />
-            <span>Document Ingestion & Policy OCR</span>
+            <span>Document Reader & Security Policies</span>
           </button>
           <button
             onClick={() => setActiveModule('rag_advisor')}
@@ -521,7 +521,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             }`}
           >
             <MessageSquareCode className="w-4 h-4 text-peach" />
-            <span>CyberRisk RAG Advisory Assistant</span>
+            <span>AI Risk Advisor</span>
           </button>
         </div>
       </motion.div>
@@ -543,18 +543,18 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-subtle">
               <div>
                 <h3 className="text-2xl font-bold text-ink">
-                  Multi-Modal Document Parsing Pipeline
+                  Automated Document Reader
                 </h3>
                 <p className="text-xs text-slate mt-0.5">
-                  Select extraction mode or upload vendor audit PDFs, security policies, and cloud architecture diagrams.
+                  Select processing mode or upload vendor audit PDFs, security policies, and cloud architecture diagrams.
                 </p>
               </div>
 
               {/* Mode Selectors */}
               <div className="flex flex-wrap items-center gap-2">
                 {[
-                  { id: 'policy_ocr', label: 'PDF Security Policy OCR' },
-                  { id: 'soc2_extract', label: 'SOC-2 Type II Extractor' },
+                  { id: 'policy_ocr', label: 'PDF Security Policy Reader' },
+                  { id: 'soc2_extract', label: 'SOC-2 Audit Extractor' },
                   { id: 'diagram_scan', label: 'Cloud Architecture Scanner' },
                 ].map((m) => (
                   <button
@@ -654,7 +654,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   <span className="text-xs font-bold text-ink">
                     {uploadedFileName ? uploadedFileName : 'Click to Upload PDF / Image / DOCX'}
                   </span>
-                  <span className="text-[11px] text-slate mt-1">Multi-modal OCR engine auto-extracts text</span>
+                  <span className="text-[11px] text-slate mt-1">Automated reader extracts text instantly</span>
                   <input
                     type="file"
                     className="hidden"
@@ -702,7 +702,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   className="w-full py-3 rounded-pill bg-ink text-paper text-xs font-bold hover:bg-black transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-60"
                 >
                   <Sparkles className="w-4 h-4 text-peach" />
-                  <span>{isParsing ? 'Processing Multi-Modal Pipeline...' : 'Parse & Extract Structured Telemetry'}</span>
+                  <span>{isParsing ? 'Processing Document...' : 'Run Document Processing'}</span>
                 </button>
               </div>
             </div>
@@ -712,30 +712,50 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
           {parseResult && (
             <div className="space-y-6 animate-in slide-in-from-bottom duration-300">
               {/* Pipeline Status Summary Card */}
-              <div className="tarazu-card bg-accent-subtle border-accent-primary p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-sienna text-paper flex items-center justify-center font-bold">
-                    <CheckCircle2 className="w-6 h-6 text-peach" />
+              <div className="tarazu-card bg-accent-subtle border-accent-primary p-5 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-sienna text-paper flex items-center justify-center font-bold shrink-0">
+                    <CheckCircle2 className="w-7 h-7 text-peach" />
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-sienna uppercase tracking-wider">
-                      Extraction Pipeline Succeeded ({parseResult.pipeline_mode})
+                    <span className="text-[10px] font-bold text-sienna uppercase tracking-wider block mb-1">
+                      Processing Complete ({parseResult.pipeline_mode})
                     </span>
-                    <h4 className="font-bold text-base text-sienna">{parseResult.filename}</h4>
+                    <h4 className="font-bold text-lg text-sienna leading-tight mb-2">{parseResult.filename}</h4>
+                    
+                    <div className="bg-white/60 p-3 rounded-lg border border-sienna/20 mt-3 max-w-lg">
+                      <h5 className="text-xs font-bold text-sienna uppercase tracking-wider mb-2">What was found?</h5>
+                      <div className="flex items-center gap-6">
+                        <div>
+                          <div className="text-2xl font-bold font-editorial text-ink">{parseResult.extracted_assets.length}</div>
+                          <div className="text-[10px] uppercase font-bold text-slate">Systems/Assets</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold font-editorial text-ink">{parseResult.extracted_controls.length}</div>
+                          <div className="text-[10px] uppercase font-bold text-slate">Security Measures</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold font-editorial text-emerald">{(parseResult.ocr_confidence * 100).toFixed(0)}%</div>
+                          <div className="text-[10px] uppercase font-bold text-slate">Reading Accuracy</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/70 text-sienna border border-sienna/20">
-                    OCR Confidence: {(parseResult.ocr_confidence * 100).toFixed(0)}%
-                  </span>
+                <div className="flex flex-col items-end gap-3 shrink-0">
                   <button
                     onClick={handleCommitParsedToInventory}
-                    className="px-4 py-2 rounded-pill bg-sienna text-paper text-xs font-bold hover:bg-black transition flex items-center gap-1.5 shadow-sm"
+                    className="px-5 py-3 rounded-xl bg-sienna text-paper text-sm font-bold hover:bg-black transition flex items-center gap-2 shadow-sm w-full md:w-auto justify-center"
                   >
-                    {committedSuccess ? <Check className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
+                    {committedSuccess ? <Check className="w-5 h-5" /> : <Layers className="w-5 h-5" />}
                     <span>{committedSuccess ? 'Committed to Inventory!' : 'Commit to Target Sheet'}</span>
                   </button>
+                  {committedSuccess && (
+                    <a href={`/sheets/${targetSheetId}`} className="text-xs font-bold text-sienna hover:underline flex items-center gap-1">
+                      View affected area <ArrowRight className="w-3 h-3" />
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -745,8 +765,8 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                 <div className="tarazu-card p-6 space-y-3">
                   <div className="flex items-center justify-between pb-3 border-b border-subtle">
                     <div>
-                      <h3 className="text-xl font-bold text-ink">Extracted Security Controls</h3>
-                      <p className="text-xs text-slate">Parsed clauses mapped to Tarazu control catalog</p>
+                      <h3 className="text-xl font-bold text-ink">Identified Security Measures</h3>
+                      <p className="text-xs text-slate">Matched rules and recommendations</p>
                     </div>
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-page border border-subtle text-slate">
                       {parseResult.extracted_controls.length} Controls
@@ -813,10 +833,10 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                 </div>
               </div>
 
-              {/* Parsed OCR Text Preview */}
+              {/* Extracted Document Text Preview */}
               <div className="tarazu-card p-6">
                 <span className="text-xs font-bold text-slate uppercase tracking-wider block mb-2">
-                  Raw Ingested Text Preview:
+                  Document Text Preview:
                 </span>
                 <pre className="p-4 rounded-2xl bg-page border border-subtle text-xs font-mono text-ink/80 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
                   {parseResult.parsed_text}
@@ -884,7 +904,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   : 'bg-page border border-subtle text-slate hover:text-ink'
               }`}
             >
-              Conversational CISO RAG Chat
+              Conversational Security Assistant
             </button>
           </div>
 
@@ -906,7 +926,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                   className="px-5 py-2.5 rounded-pill bg-ink text-paper text-xs font-bold hover:bg-black transition flex items-center gap-2 shadow-sm"
                 >
                   <Scale className="w-4 h-4 text-peach" />
-                  <span>{calculatingDpdp ? 'Evaluating Case Law...' : 'Calculate Adjudicated Exposure'}</span>
+                  <span>{calculatingDpdp ? 'Evaluating Case Law...' : 'Calculate Penalty Risk'}</span>
                 </button>
               </div>
 
@@ -1045,10 +1065,10 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-subtle">
                 <div>
                   <h3 className="text-2xl font-bold text-ink">
-                    Quantitative Board Risk Presentation Deck
+                    Management Risk Presentation
                   </h3>
                   <p className="text-xs text-slate mt-0.5">
-                    Automatically populated from live FAIR expected annual loss telemetry and compliance audits.
+                    Automatically populated from live financial impact metrics and security audits.
                   </p>
                 </div>
 
@@ -1217,7 +1237,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
                           </div>
                           <p className="text-slate">{f.finding}</p>
                           <div className="p-2.5 rounded-xl bg-peach/20 border border-sienna/20 text-[11px] text-sienna">
-                            <strong className="block mb-0.5">Recommended Statutory Amendment:</strong>
+                            <strong className="block mb-0.5">Recommended Change:</strong>
                             {f.recommended_amendment}
                           </div>
                         </div>
@@ -1234,10 +1254,10 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <div className="tarazu-card p-6 space-y-4">
               <div className="pb-3 border-b border-subtle">
                 <h3 className="text-2xl font-bold text-ink">
-                  Conversational CISO RAG Advisor
+                  Conversational Security Assistant
                 </h3>
                 <p className="text-xs text-slate mt-0.5">
-                  Live queries grounded in live organization financial telemetry, Indian DPDP Act 2023, and RBI Cyber Security circulars.
+                  Live queries grounded in live organization financial metrics, data protection laws, and security guidelines.
                 </p>
               </div>
 
@@ -1245,9 +1265,9 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               <div className="flex flex-wrap gap-2 pt-1">
                 {[
                   'What is our maximum liability under DPDP Act 2023?',
-                  'How does our lateral movement blast radius reach Core Banking?',
-                  'What does the knapsack ROSI optimizer recommend for our board deck?',
-                  'What are our top 3 compliance gaps under RBI CSF?',
+                  'How does our lateral movement impact reach Core Banking?',
+                  'What does the budget optimization tool recommend for our board deck?',
+                  'What are our top 3 compliance gaps?',
                 ].map((prompt, i) => (
                   <button
                     key={i}

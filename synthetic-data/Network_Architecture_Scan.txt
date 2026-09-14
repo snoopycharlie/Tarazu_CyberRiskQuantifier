@@ -1,0 +1,16 @@
+SCAN REPORT - 2026-09-15
+TARGET: INTERNAL CORPORATE NETWORK
+
+[Discovered Assets]
+- 10.0.5.21 (Hostname: core-router-sw1, Type: Network Device)
+- 10.0.5.22 (Hostname: vpn-gateway-primary, Type: Network Device)
+- 10.0.6.10 (Hostname: hr-system-db, Type: Database)
+- 10.0.6.15 (Hostname: employee-portal, Type: Web App)
+
+[Vulnerabilities Detected]
+- 10.0.6.10: Exposed port 5432 (PostgreSQL). Missing security patches for CVE-2023-XXXX.
+- 10.0.5.22: Outdated SSL certificate.
+
+[Dependencies]
+- employee-portal depends on hr-system-db
+- vpn-gateway-primary connects to core-router-sw1

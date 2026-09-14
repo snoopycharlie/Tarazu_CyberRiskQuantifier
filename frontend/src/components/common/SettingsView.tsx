@@ -34,6 +34,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
     if (partial.theme) {
       document.documentElement.classList.toggle('dark', partial.theme === 'dark');
     }
+    // Apply density immediately
+    if (partial.density !== undefined) {
+      document.documentElement.classList.toggle('density-compact', partial.density === 'compact');
+    }
+    // Notify App.tsx so dashboard/other views re-apply settings
+    window.dispatchEvent(new CustomEvent('tarazu-settings-changed'));
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 1500);
   };
@@ -53,6 +59,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
       localStorage.removeItem(SETTINGS_KEY);
       setSettings(DEFAULT_SETTINGS);
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('density-compact');
+      window.dispatchEvent(new CustomEvent('tarazu-settings-changed'));
     }
   };
 

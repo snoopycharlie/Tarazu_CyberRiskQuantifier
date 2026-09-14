@@ -1,0 +1,23 @@
+{
+  "vendor": "Acme Cloud Services",
+  "assessment_date": "2026-09-10",
+  "overall_status": "Warning",
+  "findings": [
+    {
+      "id": "F-01",
+      "severity": "Medium",
+      "description": "SOC2 Type II report expired.",
+      "affected_services": [
+        "auth-service-api"
+      ]
+    },
+    {
+      "id": "F-02",
+      "severity": "High",
+      "description": "Lack of Multi-Factor Authentication on partner portal.",
+      "affected_services": [
+        "payment-gateway"
+      ]
+    }
+  ]
+}

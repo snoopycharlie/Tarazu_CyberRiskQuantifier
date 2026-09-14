@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .auth import require_api_key
 from .database import init_db, AsyncSessionLocal
-from .services.seed_data import seed_demo_org, seed_healthcare_org
+from .services.seed_data import seed_demo_org, seed_healthcare_org, seed_small_business_org
 from .api import (
     organizations,
     sheets,
@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
         async with AsyncSessionLocal() as session:
             await seed_demo_org(session)
             await seed_healthcare_org(session)
+            await seed_small_business_org(session)
             await session.commit()
             logger.info("Demo organization verification completed.")
     except Exception as exc:
@@ -60,7 +61,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Tarazu (CyberRiskQuant) API",
-    description="AI-Powered Continuous Cyber Risk Quantification Platform for Indian Organizations (SIH26105)",
+    description="AI-Powered Continuous Cyber Risk Quantification Platform for Organizations",
     version="1.0.0",
     lifespan=lifespan,
 )

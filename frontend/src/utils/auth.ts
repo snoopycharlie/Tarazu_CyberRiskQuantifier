@@ -13,11 +13,13 @@ export interface DemoUser {
   name: string;
   email: string;
   role: string;
-  org: string;
+  org?: string;
+  orgId?: string;
+  avatarUrl?: string;
   loginTime: string;
 }
 
-// Demo credentials — clearly labeled for judges
+// Demo credentials
 const DEMO_CREDENTIALS: Record<string, { password: string; user: DemoUser }> = {
   'admin@tarazu.demo': {
     password: 'tarazu2026',
@@ -26,16 +28,6 @@ const DEMO_CREDENTIALS: Record<string, { password: string; user: DemoUser }> = {
       email: 'admin@tarazu.demo',
       role: 'Risk Analyst',
       org: 'Suraksha Finance Ltd',
-      loginTime: new Date().toISOString(),
-    },
-  },
-  'judge@sih.demo': {
-    password: 'sih2026',
-    user: {
-      name: 'SIH Judge',
-      email: 'judge@sih.demo',
-      role: 'Evaluator',
-      org: 'Smart India Hackathon',
       loginTime: new Date().toISOString(),
     },
   },

@@ -4,24 +4,36 @@ import { Sparkles, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
 } from 'recharts';
-import { OptimizeResult, Organization } from '../../types';
+import { OptimizeResult, Organization, DashboardSummary } from '../../types';
 import { api } from '../../services/api';
 import { formatInr } from '../../utils/format';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { containerVariants, itemVariants, slideUpVariants } from '../../utils/animations';
 
+import { AdvisorAnalytics } from './AdvisorAnalytics';
+
 interface Pillar3AdvisorViewProps {
   currentOrg: Organization | null;
+  summary?: DashboardSummary | null;
 }
 
-export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentOrg }) => {
+export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentOrg, summary }) => {
   const [budget, setBudget] = useState(5000000); // ₹50 Lakh default
   const [optResult, setOptResult] = useState<OptimizeResult | null>(null);
+  const [currency, setCurrency] = useState('INR');
   const [loadingOpt, setLoadingOpt] = useState(false);
   const [showHowCalculated, setShowHowCalculated] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem('tarazu_settings');
+      if (stored) {
+        const s = JSON.parse(stored);
+        if (s.currency) setCurrency(s.currency);
+      }
+    } catch {}
+
     if (currentOrg) {
       loadOptimization();
     }
@@ -74,6 +86,9 @@ export const Pillar3AdvisorView: React.FC<Pillar3AdvisorViewProps> = ({ currentO
           {t('advisor.subtitle')}
         </p>
       </motion.div>
+
+      {/* Advisor Analytics (Recharts) */}
+      <AdvisorAnalytics summary={summary || null} currentOrg={currentOrg} currency={currency} />
 
       {/* Budget Selector */}
       <motion.div variants={itemVariants} className="tarazu-card p-6">

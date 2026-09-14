@@ -1,0 +1,5 @@
+FreshBites Bakery - Network Scan - Sept 2026
+Hosts Found:
+- 192.168.1.1 (Router - Port 80 Open)
+- 192.168.1.10 (POS - Port 443 Open)
+- 192.168.1.20 (CCTV - Port 554 Open - Warning: RTSP Auth Disabled)

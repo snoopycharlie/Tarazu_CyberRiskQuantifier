@@ -63,6 +63,10 @@
     --shadow-md: 0 4px 12px 0 rgba(12, 27, 51, 0.08), 0 0 0 1px rgba(12, 27, 51, 0.05);
     --shadow-lg: 0 12px 32px 0 rgba(12, 27, 51, 0.10), 0 0 0 1px rgba(12, 27, 51, 0.06);
     --shadow-xl: 0 24px 48px 0 rgba(12, 27, 51, 0.14), 0 0 0 1px rgba(12, 27, 51, 0.07);
+    --shadow-elevated: 0 8px 24px 0 rgba(12, 27, 51, 0.12), 0 0 0 1px rgba(12, 27, 51, 0.06);
+
+    /* Alias: medium risk color */
+    --risk-med: #F57C00;
 
     /* Glows */
     --glow-teal:     0 0 0 3px rgba(0, 196, 180, 0.20);
@@ -84,6 +88,9 @@
     /* Gradient: brand */
     --gradient-brand: linear-gradient(135deg, #00C4B4 0%, #009E90 100%);
     --gradient-brand-subtle: linear-gradient(135deg, rgba(0,196,180,0.12) 0%, rgba(0,158,144,0.06) 100%);
+
+    /* Alias: used by Pillar1 and Pillar2 components */
+    --border-dim: #D1DCE8;
   }
 
   .dark {
@@ -143,6 +150,10 @@
     --shadow-md: 0 4px 16px 0 rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(255, 255, 255, 0.05);
     --shadow-lg: 0 12px 36px 0 rgba(0, 0, 0, 0.50), 0 0 0 1px rgba(255, 255, 255, 0.05);
     --shadow-xl: 0 24px 56px 0 rgba(0, 0, 0, 0.60), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --shadow-elevated: 0 8px 32px 0 rgba(0, 0, 0, 0.50), 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    /* Alias: medium risk color */
+    --risk-med: #FFB300;
 
     /* Glows */
     --glow-teal:     0 0 0 3px rgba(0, 212, 196, 0.25);
@@ -164,6 +175,9 @@
     /* Gradient: brand */
     --gradient-brand: linear-gradient(135deg, #00D4C4 0%, #00C4B4 100%);
     --gradient-brand-subtle: linear-gradient(135deg, rgba(0,212,196,0.12) 0%, rgba(0,196,180,0.06) 100%);
+
+    /* Alias: used by Pillar1 and Pillar2 components */
+    --border-dim: #1F3050;
   }
 
   /* ── Base HTML ──────────────────────────────────────────── */
@@ -583,4 +597,34 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DENSITY COMPACT — tighter spacing and smaller font sizes
+   Applied when .density-compact class is on <html>
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.density-compact .tarazu-card {
+  padding: 0.75rem !important;
+}
+.density-compact .space-y-8 > * + * {
+  margin-top: 1rem !important;
+}
+.density-compact .space-y-6 > * + * {
+  margin-top: 0.75rem !important;
+}
+.density-compact .metric-value {
+  font-size: 1.75rem !important;
+  line-height: 1.2 !important;
+}
+.density-compact th,
+.density-compact td {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+.density-compact h1 {
+  font-size: 2rem !important;
+  line-height: 1.2 !important;
+}
+.density-compact h3 {
+  font-size: 1.1rem !important;
 }

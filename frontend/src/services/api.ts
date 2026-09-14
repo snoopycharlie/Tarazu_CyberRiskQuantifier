@@ -235,7 +235,15 @@ export const api = {
   },
   whatIfSimulation: async (
     orgId: string,
-    toggledControls: Record<string, string>,
+    payload: {
+      scenario_id?: string;
+      changes: any[];
+      toggled_controls?: Record<string, string>;
+      scenario_type?: string;
+      target_id?: string;
+      target_state?: string;
+      numeric_shift?: number;
+    },
     sheetId?: string,
     currency = 'INR',
     period = 'annual',
@@ -248,7 +256,13 @@ export const api = {
         body: JSON.stringify({
           org_id: orgId,
           sheet_id: sheetId,
-          toggled_controls: toggledControls,
+          scenario_id: payload.scenario_id,
+          changes: payload.changes || [],
+          toggled_controls: payload.toggled_controls || {},
+          scenario_type: payload.scenario_type,
+          target_id: payload.target_id,
+          target_state: payload.target_state,
+          numeric_shift: payload.numeric_shift,
         }),
       });
     } catch {

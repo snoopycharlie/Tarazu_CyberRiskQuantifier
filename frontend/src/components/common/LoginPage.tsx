@@ -87,80 +87,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           }}
         />
 
-        {/* Logo */}
-        <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #00D4C4 0%, #00C4B4 100%)',
-                boxShadow: '0 4px 16px rgba(0,212,196,0.40)',
-              }}
-            >
-              <Scale className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="text-xl font-bold text-white" style={{ letterSpacing: '-0.03em' }}>Tarazu</span>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] mt-0.5" style={{ color: 'rgba(0,212,196,0.7)' }}>
-                Risk Platform
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Core Message */}
-        <div className="relative z-10 max-w-md">
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.12em] mb-4"
-            style={{ color: 'rgba(0,212,196,0.7)' }}
-          >
-            Cyber Risk Quantification
-          </p>
+        {/* Minimal Branding */}
+        <div className="relative z-10 flex flex-col justify-center h-full max-w-md">
           <h1
-            className="text-5xl font-bold leading-tight mb-6"
+            className="text-6xl font-bold leading-tight mb-4"
             style={{ color: '#E8F1FB', letterSpacing: '-0.04em' }}
           >
-            Translate Risk<br />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #00D4C4 0%, #00C4B4 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              into Numbers.
-            </span>
+            Tarazu
           </h1>
-          <p className="text-base leading-relaxed" style={{ color: 'rgba(127,168,204,0.85)' }}>
-            Translate complex vulnerabilities into clear financial exposure
-            — to drive smarter, data-driven security investments.
+          <p className="text-xl" style={{ color: 'rgba(127,168,204,0.85)' }}>
+            AI Cyber Risk Quantification.
           </p>
-
-          {/* Feature callouts */}
-          <div className="mt-8 space-y-3">
-            {[
-              { icon: BarChart3, text: 'FAIR-calibrated financial risk quantification' },
-              { icon: Shield,    text: 'RBI CSF · ISO 27001 · NIST CSF compliance mapping' },
-              { icon: Activity,  text: 'Real-time NIST NVD API v2.0 threat intelligence' },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-3">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(0,212,196,0.10)', border: '1px solid rgba(0,212,196,0.20)' }}
-                >
-                  <Icon className="w-3.5 h-3.5" style={{ color: '#00D4C4' }} />
-                </div>
-                <span className="text-sm" style={{ color: 'rgba(127,168,204,0.8)' }}>{text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom line */}
-        <div className="relative z-10 flex items-center justify-between text-xs" style={{ color: 'rgba(61,91,122,0.8)' }}>
-          <span>Enterprise Cyber Risk Management</span>
-          <span className="font-mono">SIH26105</span>
         </div>
       </div>
 

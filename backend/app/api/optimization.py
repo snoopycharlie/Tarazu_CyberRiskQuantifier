@@ -11,13 +11,14 @@ from sqlalchemy.orm import selectinload
 
 from ..database import get_db
 from ..auth import AuthContext, assert_org_access, require_api_key
-from ..models import Organization, Control, Sheet, Asset, RiskScore
+from ..models import Organization, Control, Sheet, Asset, RiskScore, GraphEdge
 from ..schemas import (
     ControlOut, ControlUpdate, OptimizeRequest, OptimizeResult,
-    WhatIfRequest, WhatIfResult
+    WhatIfRequest, WhatIfResult, BlastRadiusResult
 )
 from ..services.optimizer import compute_rosi, estimate_control_risk_reduction
 from ..services.ai_service import assess_recommendations
+from ..services.blast_radius import compute_blast_radius
 from ..services.rules_engine import (
     OrgContext, AssetContext, VulnContext, ControlsContext,
     compute_asset_risk
@@ -238,13 +239,7 @@ async def what_if_simulation(
     base_controls_data = [{"name": c.name, "status": c.status} for c in all_controls]
     base_controls_ctx = ControlsContext.from_control_list(base_controls_data)
 
-    # Toggled controls map
-    toggled_controls_data = []
-    for c in all_controls:
-        effective_status = payload.toggled_controls.get(c.id, c.status)
-        toggled_controls_data.append({"name": c.name, "status": effective_status})
-    toggled_controls_ctx = ControlsContext.from_control_list(toggled_controls_data)
-
+    # 1. Base Organization Context
     org_ctx = OrgContext(
         sector=org.sector,
         size_tier=org.size_tier,
@@ -252,11 +247,120 @@ async def what_if_simulation(
         annual_revenue_inr=org.annual_revenue_inr,
     )
 
+    # 2. Simulated Organization Context (starts identical to base)
+    sim_org_ctx = OrgContext(
+        sector=org.sector,
+        size_tier=org.size_tier,
+        employee_count=org.employee_count,
+        annual_revenue_inr=org.annual_revenue_inr,
+    )
+
+    # State modifications from scenario changes
+    toggled_controls_data = []
+    unavailable_asset_ids = set()
+    global_cvss_shift = 0.0
+    global_days_unpatched_shift = 0
+    incident_response_multiplier = 1.0
+
+    # Fallback to legacy single-toggles if no new array is passed
+    if not payload.changes and (payload.scenario_type or payload.toggled_controls):
+        if payload.scenario_type == "revenue_shift" and payload.numeric_shift is not None:
+            shift_factor = 1.0 + (payload.numeric_shift / 100.0)
+            sim_org_ctx.annual_revenue_inr = max(0.0, org.annual_revenue_inr * shift_factor)
+        if payload.scenario_type == "downtime" and payload.target_id:
+            unavailable_asset_ids.add(payload.target_id)
+        for c in all_controls:
+            effective_status = payload.toggled_controls.get(c.id, c.status)
+            if payload.scenario_type == "control_toggle" and payload.target_id == c.id and payload.target_state:
+                effective_status = payload.target_state
+            toggled_controls_data.append({"name": c.name, "status": effective_status})
+    else:
+        # Process the new generic `changes` array
+        # First initialize toggled_controls_data with base statuses
+        controls_dict = {c.id: c.status for c in all_controls}
+        for change in payload.changes:
+            if change.change_type == "metric_shift" and change.target_id == "revenue" and change.value_num is not None:
+                shift_factor = 1.0 + (change.value_num / 100.0)
+                sim_org_ctx.annual_revenue_inr = max(0.0, org.annual_revenue_inr * shift_factor)
+            elif change.change_type == "asset_availability" and change.target_id and change.value_str == "unavailable":
+                unavailable_asset_ids.add(change.target_id)
+            elif change.change_type == "control_toggle" and change.target_id and change.value_str:
+                controls_dict[change.target_id] = change.value_str
+            elif change.change_type == "global_vuln_shift" and change.target_id == "cvss" and change.value_num is not None:
+                global_cvss_shift += change.value_num
+            elif change.change_type == "global_vuln_shift" and change.target_id == "days_unpatched" and change.value_num is not None:
+                global_days_unpatched_shift += int(change.value_num)
+            elif change.change_type == "incident_response_shift" and change.value_num is not None:
+                # E.g. -20% impact means multiplier is 0.8
+                incident_response_multiplier *= max(0.0, (1.0 + (change.value_num / 100.0)))
+        
+        for c in all_controls:
+            toggled_controls_data.append({"name": c.name, "status": controls_dict.get(c.id, c.status)})
+
+    toggled_controls_ctx = ControlsContext.from_control_list(toggled_controls_data)
+
     original_eal = 0.0
     new_eal = 0.0
     all_new_traces = []
 
+    # If downtime scenario, we don't calculate everything standardly, we want blast radius
+    # But for a consistent result, we can calculate the normal base and then augment the delta.
+    # Actually, we will calculate the base, then for downtime we calculate blast radius and consider that an *addition* to EAL.
+    blast_radius_res = None
+    affected_assets_count = None
+    downstream_impact_inr = None
+
+    if unavailable_asset_ids:
+        # We need to run blast radius for all unavailable assets. For simplicity we just do it for the first one for now,
+        # or combine them if there are multiple.
+        # Let's just pick one if present. A robust solution would do a multi-source traversal.
+        primary_target_id = next(iter(unavailable_asset_ids))
+        
+        # Load edges for blast radius
+        asset_ids = {a.id for a in assets}
+        edges_res = await db.execute(
+            select(GraphEdge).where(
+                GraphEdge.source_asset_id.in_(asset_ids) | GraphEdge.target_asset_id.in_(asset_ids)
+            )
+        )
+        edges = edges_res.scalars().all()
+        edge_dicts = [
+            {
+                "source_asset_id": e.source_asset_id,
+                "target_asset_id": e.target_asset_id,
+                "dependency_strength": e.dependency_strength,
+            }
+            for e in edges
+        ]
+        
+        # Calculate base risk scores needed for blast radius EAL map
+        asset_name_map = {}
+        asset_eal_map = {}
+        for a in assets:
+            asset_name_map[a.id] = a.name
+            vulns = [VulnContext(cvss_score=v.cvss_score, days_unpatched=v.days_unpatched, cve_id=v.cve_id, description=v.description) for v in a.vulnerabilities]
+            actx = AssetContext(name=a.name, asset_type=a.asset_type, criticality_tag=a.criticality_tag, revenue_dependency_pct=a.revenue_dependency_pct)
+            bres = compute_asset_risk(org_ctx, actx, vulns, base_controls_ctx)
+            asset_eal_map[a.id] = bres.expected_annual_loss_inr
+            
+        blast_data = compute_blast_radius(primary_target_id, edge_dicts, asset_eal_map, asset_name_map)
+        if blast_data:
+            blast_radius_res = BlastRadiusResult(**blast_data)
+            affected_assets_count = len(blast_radius_res.reachable_asset_ids)
+            downstream_impact_inr = blast_radius_res.total_downstream_exposure_inr
+
+    # Distributions
+    dist_before = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    dist_after = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    
+    def get_risk_band(eal: float) -> str:
+        if eal >= 10_000_000: return "critical"
+        if eal >= 2_500_000: return "high"
+        if eal >= 500_000: return "medium"
+        return "low"
+
     for a in assets:
+        # Base vulnerabilities
         vuln_ctxs = [
             VulnContext(
                 cvss_score=v.cvss_score,
@@ -266,6 +370,18 @@ async def what_if_simulation(
             )
             for v in a.vulnerabilities
         ]
+        
+        # Sim vulnerabilities with global shifts
+        sim_vuln_ctxs = [
+            VulnContext(
+                cvss_score=min(10.0, max(0.0, (v.cvss_score or 0) + global_cvss_shift)),
+                days_unpatched=max(0, (v.days_unpatched or 0) + global_days_unpatched_shift),
+                cve_id=v.cve_id,
+                description=v.description,
+            )
+            for v in a.vulnerabilities
+        ]
+
         asset_ctx = AssetContext(
             name=a.name,
             asset_type=a.asset_type,
@@ -274,11 +390,34 @@ async def what_if_simulation(
         )
 
         base_res = compute_asset_risk(org_ctx, asset_ctx, vuln_ctxs, base_controls_ctx)
-        new_res = compute_asset_risk(org_ctx, asset_ctx, vuln_ctxs, toggled_controls_ctx)
-
         original_eal += base_res.expected_annual_loss_inr
-        new_eal += new_res.expected_annual_loss_inr
-        all_new_traces.extend(new_res.as_dict_trace())
+        dist_before[get_risk_band(base_res.expected_annual_loss_inr)] += 1
+        
+        if a.id in unavailable_asset_ids:
+            # If the asset is down, its risk effectively fully materializes for this scenario.
+            # We skip normal control evaluation for this specific asset.
+            penalty = base_res.expected_annual_loss_inr * 2 # Arbitrary severe penalty for direct downtime
+            new_eal += penalty
+            dist_after["critical"] += 1
+            all_new_traces.append({"rule_id": "DOWNTIME", "description": f"Simulated complete downtime for {a.name}", "contribution_inr": penalty, "rule_tier": "universal", "reason": "Asset unavailable"})
+            continue
+            
+        new_res = compute_asset_risk(sim_org_ctx, asset_ctx, sim_vuln_ctxs, toggled_controls_ctx)
+        
+        # Apply incident response multiplier
+        adjusted_new_eal = new_res.expected_annual_loss_inr * incident_response_multiplier
+        
+        new_eal += adjusted_new_eal
+        dist_after[get_risk_band(adjusted_new_eal)] += 1
+        
+        # Update traces
+        for t in new_res.as_dict_trace():
+            if incident_response_multiplier != 1.0:
+                t["contribution_inr"] *= incident_response_multiplier
+            all_new_traces.append(t)
+
+    if downstream_impact_inr:
+        new_eal += downstream_impact_inr
 
     delta_inr = round(original_eal - new_eal, 2)
     delta_pct = round((delta_inr / max(original_eal, 1.0)) * 100.0, 1)
@@ -291,33 +430,26 @@ async def what_if_simulation(
             seen_rules.add(t["rule_id"])
             dedup_traces.append(t)
 
-    # Currency + period display fields (additive)
-    try:
-        orig_display = currency_service.convert_and_format(original_eal, currency)
-        new_display = currency_service.convert_and_format(new_eal, currency)
-        delta_display = currency_service.convert_and_format(delta_inr, currency)
-    except ValueError:
-        orig_display = currency_service.convert_and_format(original_eal, "INR")
-        new_display = currency_service.convert_and_format(new_eal, "INR")
-        delta_display = currency_service.convert_and_format(delta_inr, "INR")
-
     period_eal = period_service.to_period(original_eal, period, days)
+    period_new_eal = period_service.to_period(new_eal, period, days)
     period_delta = period_service.to_period(delta_inr, period, days)
     period_lbl = period_service.period_label(period, days)
     try:
         period_eal_display = currency_service.convert_and_format(period_eal, currency)
+        period_new_display = currency_service.convert_and_format(period_new_eal, currency)
         period_delta_display = currency_service.convert_and_format(period_delta, currency)
     except ValueError:
         period_eal_display = currency_service.convert_and_format(period_eal, "INR")
+        period_new_display = currency_service.convert_and_format(period_new_eal, "INR")
         period_delta_display = currency_service.convert_and_format(period_delta, "INR")
 
     return WhatIfResult(
-        original_eal_inr=round(original_eal, 2),
-        original_eal_display=orig_display,
-        new_eal_inr=round(new_eal, 2),
-        new_eal_display=new_display,
-        delta_inr=delta_inr,
-        delta_display=delta_display,
+        original_eal_inr=round(period_eal, 2),
+        original_eal_display=period_eal_display,
+        new_eal_inr=round(period_new_eal, 2),
+        new_eal_display=period_new_display,
+        delta_inr=round(period_delta, 2),
+        delta_display=period_delta_display,
         delta_pct=delta_pct,
         rule_trace=dedup_traces[:10],
         ai_mode="rules_only",
@@ -326,4 +458,17 @@ async def what_if_simulation(
         period_eal_display=period_eal_display,
         period_delta_inr=round(period_delta, 2),
         period_delta_display=period_delta_display,
+        affected_assets_count=affected_assets_count,
+        downstream_impact_inr=round(downstream_impact_inr, 2) if downstream_impact_inr else None,
+        downstream_impact_display=currency_service.convert_and_format(downstream_impact_inr, currency) if downstream_impact_inr else None,
+        blast_radius_result=blast_radius_res,
+        
+        # New Rich Statistics
+        affected_assets_total=len(assets),
+        affected_assets_critical=sum(1 for a in assets if a.criticality_tag == "critical"),
+        revenue_change_inr=round(sim_org_ctx.annual_revenue_inr - org_ctx.annual_revenue_inr, 2),
+        revenue_change_display=currency_service.convert_and_format(sim_org_ctx.annual_revenue_inr - org_ctx.annual_revenue_inr, currency),
+        cost_change_inr=0.0, # We're not simulating cost increases yet, but we could!
+        risk_distribution_before=dist_before,
+        risk_distribution_after=dist_after,
     )

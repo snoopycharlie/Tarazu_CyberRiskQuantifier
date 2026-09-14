@@ -1,0 +1,3 @@
+Risk ID,Description,Severity,Affected Asset
+RSK-001,Outdated OS on POS,High,POS Terminal (Front Desk)
+RSK-002,Weak Default Password,Medium,Store Wi-Fi Router

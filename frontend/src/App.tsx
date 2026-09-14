@@ -80,14 +80,21 @@ export const App: React.FC = () => {
     setAuthChecked(true);
   }, []);
 
-  // Apply stored settings on mount
+  // Apply stored settings on mount and whenever settings change
   useEffect(() => {
-    const settings = loadSettings();
-    document.documentElement.classList.toggle('dark', settings.theme === 'dark');
-    // Respect default page setting
-    if (settings.defaultPage && settings.defaultPage !== 'dashboard') {
-      setActiveTab(settings.defaultPage);
-    }
+    const applySettings = () => {
+      const settings = loadSettings();
+      document.documentElement.classList.toggle('dark', settings.theme === 'dark');
+      // Density mode — add/remove 'density-compact' class
+      document.documentElement.classList.toggle('density-compact', settings.density === 'compact');
+      if (settings.defaultPage && settings.defaultPage !== 'dashboard') {
+        setActiveTab(settings.defaultPage);
+      }
+    };
+    applySettings();
+    // Listen for settings changes made in SettingsView (same tab via storage event fallback)
+    window.addEventListener('tarazu-settings-changed', applySettings);
+    return () => window.removeEventListener('tarazu-settings-changed', applySettings);
   }, []);
 
   // Init app data once authenticated
@@ -118,9 +125,10 @@ export const App: React.FC = () => {
 
   const loadOrgTelemetry = async (orgId: string) => {
     try {
+      const { currency } = loadSettings();
       const [sheetsData, dashData] = await Promise.all([
         api.listSheets(orgId),
-        api.getDashboard(orgId),
+        api.getDashboard(orgId, currency || 'INR'),
       ]);
       setSheets(sheetsData);
       setDashboard(dashData);
@@ -244,7 +252,7 @@ export const App: React.FC = () => {
             />
           )}
 
-          {activeTab === 'pillar3' && <Pillar3AdvisorView currentOrg={currentOrg} />}
+          {activeTab === 'pillar3' && <Pillar3AdvisorView currentOrg={currentOrg} summary={dashboard} />}
 
           {activeTab === 'whatif' && <WhatIfView currentOrg={currentOrg} />}
 

@@ -10,6 +10,7 @@ import {
   Handle,
   Position,
   NodeProps,
+  BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
@@ -75,8 +76,11 @@ const AssetNode = ({ data, selected }: NodeProps) => {
   const showWarning = (risk === 'critical' || risk === 'high') && !isDimmed;
 
   return (
-    <div
-      className={`relative flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-300 shadow-sm ${selected ? 'shadow-lg scale-105' : ''} ${isDimmed ? 'opacity-30' : 'opacity-100'}`}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, delay: Math.random() * 0.3, type: 'spring' }}
+      className={`relative flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-300 shadow-sm ${selected ? 'shadow-lg scale-105' : ''} ${isDimmed ? 'opacity-30 grayscale' : 'opacity-100'}`}
       style={{ minWidth: 230, backgroundColor: bgColor, borderColor: borderColor }}
     >
       <Handle type="target" position={Position.Top} className="!opacity-0" />
@@ -103,7 +107,7 @@ const AssetNode = ({ data, selected }: NodeProps) => {
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="!opacity-0" />
-    </div>
+    </motion.div>
   );
 };
 
@@ -157,11 +161,24 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
   const [blastResult, setBlastResult] = useState<BlastRadiusResult | null>(null);
   const [calculatingBlast, setCalculatingBlast] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [layoutDirection, setLayoutDirection] = useState<'TB' | 'LR'>('TB');
   const { t } = useLanguage();
+
+  // Store raw graph data so we can re-layout without re-fetching
+  const [rawGraphData, setRawGraphData] = useState<{ nodes: any[]; edges: any[] }>({ nodes: [], edges: [] });
 
   useEffect(() => {
     if (activeSheetId) loadGraph(activeSheetId);
   }, [activeSheetId]);
+
+  // Re-apply layout when direction changes (no re-fetch needed)
+  useEffect(() => {
+    if (rawGraphData.nodes.length > 0) {
+      const { nodes: ln, edges: le } = getLayoutedElements(rawGraphData.nodes, rawGraphData.edges, layoutDirection);
+      setNodes(ln);
+      setEdges(le);
+    }
+  }, [layoutDirection]);
 
   const loadGraph = async (sheetId: string) => {
     try {
@@ -190,7 +207,8 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
           markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--border-strong)' },
         }));
 
-      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(rawNodes, rawEdges);
+      setRawGraphData({ nodes: rawNodes, edges: rawEdges });
+      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(rawNodes, rawEdges, layoutDirection);
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     } catch (err) {
@@ -298,6 +316,13 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setLayoutDirection(d => d === 'TB' ? 'LR' : 'TB')}
+            className="btn-secondary flex items-center gap-2 px-4 py-2 text-xs"
+            title="Toggle layout direction"
+          >
+            <span>{layoutDirection === 'TB' ? '↔ Horizontal' : '↕ Vertical'}</span>
+          </button>
           <button onClick={() => setShowHelp(!showHelp)} className="btn-secondary flex items-center gap-2 px-4 py-2">
             <Info className="w-4 h-4" />
             {t('spread.howToUse')}
@@ -390,7 +415,7 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
       </AnimatePresence>
 
       {/* ── Canvas Area ──────────────────────────────────────────────────── */}
-      <motion.div variants={itemVariants} className="relative h-[650px] rounded-xl border overflow-hidden shadow-inner" style={{ borderColor: 'var(--border-dim)', background: 'var(--bg-surface)' }}>
+      <motion.div variants={itemVariants} className="relative h-[650px] rounded-xl border overflow-hidden shadow-inner" style={{ borderColor: 'var(--border-dim)', background: 'radial-gradient(circle at center, var(--bg-surface) 0%, var(--bg-elevated) 100%)' }}>
         {loading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm" style={{ background: 'rgba(var(--bg-surface-rgb), 0.8)' }}>
             <RefreshCw className="w-8 h-8 animate-spin" style={{ color: 'var(--accent-primary)' }} />
@@ -409,8 +434,29 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
           attributionPosition="bottom-right"
           className="bg-page"
         >
-          <Background color="var(--border-strong)" gap={20} size={1} />
+          <Background color="var(--border-dim)" variant={BackgroundVariant.Lines} gap={30} size={1} className="opacity-40" />
           <Controls className="bg-surface border border-border-dim shadow-soft rounded-lg overflow-hidden [&>button]:border-b [&>button]:border-border-dim hover:[&>button]:bg-surface-hover" style={{ color: 'var(--text-primary)' }} />
+          <MiniMap
+            nodeStrokeColor={(n) => {
+              const risk = n.data?.risk_level as string;
+              if (risk === 'critical') return 'var(--risk-critical)';
+              if (risk === 'high') return 'var(--risk-high)';
+              if (risk === 'medium') return 'var(--risk-medium)';
+              return 'var(--border-strong)';
+            }}
+            nodeColor={(n) => {
+              const risk = n.data?.risk_level as string;
+              if (risk === 'critical') return 'rgba(232,40,45,0.2)';
+              if (risk === 'high') return 'rgba(245,124,0,0.2)';
+              if (risk === 'medium') return 'rgba(0,196,180,0.15)';
+              return 'var(--bg-surface-hover)';
+            }}
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '8px',
+            }}
+          />
         </ReactFlow>
 
         {/* ── Detail Panel ─────────────────────────────────────────────────── */}

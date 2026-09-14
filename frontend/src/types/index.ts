@@ -154,21 +154,56 @@ export interface OptimizeResult {
   ai_mode: string;
 }
 
+export interface ScenarioChange {
+  change_type: string;
+  target_id?: string;
+  value_str?: string;
+  value_num?: number;
+}
+
+export interface WhatIfRequest {
+  org_id: string;
+  scenario_id?: string;
+  changes: ScenarioChange[];
+  // Legacy fields
+  sheet_id?: string;
+  toggled_controls?: Record<string, string>;
+  scenario_type?: string;
+  target_id?: string;
+  target_state?: string;
+  numeric_shift?: number;
+}
+
 export interface WhatIfResult {
+  currency?: string;
   original_eal_inr: number;
-  original_eal_display?: MoneyDisplay | null;
+  original_eal_display?: MoneyDisplay;
   new_eal_inr: number;
-  new_eal_display?: MoneyDisplay | null;
+  new_eal_display?: MoneyDisplay;
   delta_inr: number;
-  delta_display?: MoneyDisplay | null;
+  delta_display?: MoneyDisplay;
   delta_pct: number;
-  rule_trace: RuleTraceItem[];
+  rule_trace: any[];
   ai_mode: string;
   period?: string;
-  period_eal_inr?: number | null;
-  period_eal_display?: MoneyDisplay | null;
-  period_delta_inr?: number | null;
-  period_delta_display?: MoneyDisplay | null;
+  period_eal_inr?: number;
+  period_eal_display?: MoneyDisplay;
+  period_delta_inr?: number;
+  period_delta_display?: MoneyDisplay;
+  
+  affected_assets_count?: number;
+  downstream_impact_inr?: number;
+  downstream_impact_display?: MoneyDisplay;
+  blast_radius_result?: BlastRadiusResult;
+  
+  affected_assets_total?: number;
+  affected_assets_critical?: number;
+  revenue_change_inr?: number;
+  revenue_change_display?: MoneyDisplay;
+  cost_change_inr?: number;
+  cost_change_display?: MoneyDisplay;
+  risk_distribution_before?: Record<string, number>;
+  risk_distribution_after?: Record<string, number>;
 }
 
 export interface ComplianceGapItem {

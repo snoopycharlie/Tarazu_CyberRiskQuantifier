@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, AlertTriangle, Layers, ChevronRight, TrendingDown, Network, Wallet,
-  Info, ArrowUpRight
+  Info, ArrowUpRight, Activity
 } from 'lucide-react';
 import { DashboardSummary, Sheet } from '../../types';
-import { formatInr } from '../../utils/format';
+import { formatInr, formatMoney } from '../../utils/format';
+import { loadSettings } from '../../utils/settings';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { containerVariants, itemVariants, slideUpVariants } from '../../utils/animations';
+import { AnimatedNumber } from '../common/AnimatedNumber';
 
 interface DashboardViewProps {
   summary: DashboardSummary | null;
@@ -111,7 +113,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </button>
             </div>
             <div className="metric-value mt-3" style={{ color: 'var(--risk-critical)' }}>
-              {summary.total_eal_display?.formatted ?? formatInr(summary.total_eal_inr)}
+              <AnimatedNumber value={summary.total_eal_inr} format={(v) => summary.total_eal_display?.formatted ?? formatMoney(v, loadSettings().currency || 'INR')} />
             </div>
             <span className="text-[11px] font-semibold mt-1 block" style={{ color: 'var(--risk-critical)', opacity: 0.85 }}>{t('dash.kpi.exposureTag')}</span>
           </div>
@@ -152,7 +154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <Layers className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
             </div>
             <div className="metric-value mt-3" style={{ color: 'var(--text-primary)' }}>
-              {summary.total_assets}
+              <AnimatedNumber value={summary.total_assets} />
             </div>
           </div>
           <p className="text-xs mt-3 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -168,7 +170,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <AlertTriangle className="w-4 h-4" style={{ color: 'var(--risk-high)' }} />
             </div>
             <div className="metric-value mt-3" style={{ color: 'var(--text-primary)' }}>
-              {summary.critical_vulnerabilities}
+              <AnimatedNumber value={summary.critical_vulnerabilities} />
             </div>
           </div>
           <p className="text-xs mt-3 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -184,12 +186,67 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <Shield className="w-4 h-4" style={{ color: 'var(--risk-low)' }} />
             </div>
             <div className="metric-value mt-3" style={{ color: 'var(--text-primary)' }}>
-              {avgCompliancePct}%
+              <AnimatedNumber value={avgCompliancePct} />%
             </div>
           </div>
           <div className="text-xs mt-3 flex items-center justify-between font-semibold" style={{ color: 'var(--text-secondary)' }}>
             <span>RBI: {summary.compliance_rbi_csf.satisfied}/{summary.compliance_rbi_csf.total}</span>
             <span>ISO: {summary.compliance_iso27001.satisfied}/{summary.compliance_iso27001.total}</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Secondary KPIs (Derived) ────────────────────────────── */}
+      <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        {/* Average Exposure per Asset */}
+        <div className="tarazu-card p-4 flex flex-col justify-between" style={{ background: 'var(--bg-surface-hover)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-md flex items-center justify-center bg-white/5 border border-white/10 dark:bg-black/20 dark:border-white/5">
+              <Activity className="w-3.5 h-3.5" style={{ color: 'var(--text-secondary)' }} />
+            </div>
+            <span className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg Impact per System</span>
+          </div>
+          <div className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+            <AnimatedNumber value={summary.total_eal_inr / Math.max(summary.total_assets, 1)} format={formatInr} />
+          </div>
+        </div>
+
+        {/* Risk Density */}
+        <div className="tarazu-card p-4 flex flex-col justify-between" style={{ background: 'var(--bg-surface-hover)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-md flex items-center justify-center bg-white/5 border border-white/10 dark:bg-black/20 dark:border-white/5">
+              <AlertTriangle className="w-3.5 h-3.5" style={{ color: 'var(--risk-high)' }} />
+            </div>
+            <span className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Critical Density</span>
+          </div>
+          <div className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+            <AnimatedNumber value={(summary.critical_vulnerabilities / Math.max(summary.total_assets, 1)) * 100} format={(v) => v.toFixed(1)} />%
+          </div>
+        </div>
+
+        {/* Segments Monitored */}
+        <div className="tarazu-card p-4 flex flex-col justify-between" style={{ background: 'var(--bg-surface-hover)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-md flex items-center justify-center bg-white/5 border border-white/10 dark:bg-black/20 dark:border-white/5">
+              <Network className="w-3.5 h-3.5" style={{ color: 'var(--accent-primary)' }} />
+            </div>
+            <span className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Network Areas</span>
+          </div>
+          <div className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+            <AnimatedNumber value={summary.sheets_breakdown.length} /> Segments
+          </div>
+        </div>
+
+        {/* Mitigation ROI */}
+        <div className="tarazu-card p-4 flex flex-col justify-between" style={{ background: 'var(--bg-surface-hover)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-md flex items-center justify-center bg-white/5 border border-white/10 dark:bg-black/20 dark:border-white/5">
+              <TrendingDown className="w-3.5 h-3.5" style={{ color: 'var(--risk-low)' }} />
+            </div>
+            <span className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg Investment Return</span>
+          </div>
+          <div className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+            <AnimatedNumber value={summary.top_roi_controls.length ? (summary.top_roi_controls.reduce((acc, c) => acc + c.roi_ratio, 0) / summary.top_roi_controls.length) : 0} format={(v) => v.toFixed(1)} />x
           </div>
         </div>
       </motion.div>

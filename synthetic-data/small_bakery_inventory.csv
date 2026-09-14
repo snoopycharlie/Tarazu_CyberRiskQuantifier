@@ -1,0 +1,6 @@
+Asset Name,Type,Status,Criticality,Owner,IP
+POS Terminal (Front Desk),Workstation,Running,High,Store Manager,192.168.1.10
+Store Wi-Fi Router,Network Device,Running,Medium,IT Support,192.168.1.1
+Owner Laptop,Workstation,Running,Medium,Owner,192.168.1.15
+CCTV Camera System,Network Device,Running,Low,Security,192.168.1.20
+Inventory Tablet,Workstation,Running,Medium,Staff,192.168.1.12

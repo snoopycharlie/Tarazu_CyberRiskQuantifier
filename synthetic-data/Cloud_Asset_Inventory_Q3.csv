@@ -1,0 +1,9 @@
+Asset Name,Type,Status,Criticality,Owner,IP
+prod-db-cluster-01,Database,Running,High,Data Team,10.0.1.45
+auth-service-api,API,Running,Critical,Security Team,10.0.1.12
+marketing-site,Web App,Running,Low,Marketing,10.0.2.100
+internal-wiki,Web App,Stopped,Low,IT,10.0.2.101
+payment-gateway,Service,Running,Critical,Payments,10.0.1.25
+legacy-crm,Web App,Running,Medium,Sales,10.0.3.50
+analytics-queue,Queue,Running,Medium,Data Team,10.0.3.51
+backup-storage,Storage,Running,High,IT,10.0.4.10
