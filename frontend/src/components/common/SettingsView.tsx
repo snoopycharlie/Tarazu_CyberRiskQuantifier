@@ -261,6 +261,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentUser, onLogou
             <option value="compliance">Compliance</option>
           </select>
         </div>
+
+        <div>
+          <label className="section-label block mb-2">
+            Display Currency
+          </label>
+          <select
+            value={settings.currency}
+            onChange={(e) => update({ currency: e.target.value })}
+            className="cyber-select"
+          >
+            <option value="INR">₹ INR — Indian Rupee (Lakh/Crore)</option>
+            <option value="USD">$ USD — US Dollar</option>
+            <option value="EUR">€ EUR — Euro</option>
+            <option value="GBP">£ GBP — British Pound</option>
+            <option value="AED">AED — UAE Dirham</option>
+            <option value="SGD">S$ SGD — Singapore Dollar</option>
+          </select>
+          <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
+            Converted amounts are shown alongside INR figures across the dashboard.
+          </p>
+        </div>
       </motion.section>
 
       {/* Notifications */}

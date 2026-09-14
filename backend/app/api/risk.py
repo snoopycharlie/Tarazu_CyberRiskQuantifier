@@ -3,7 +3,7 @@ app/api/risk.py — Risk Quantification calculation triggers for assets and shee
 """
 from __future__ import annotations
 import logging
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -18,6 +18,7 @@ from ..services.rules_engine import (
 )
 from ..services.ai_service import assess_risk
 from ..services.derived_sheets import recompute_dependent_sheets
+from ..services import currency_service, period_service
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,12 @@ router = APIRouter(prefix="/api/risk", tags=["Risk Quantification"])
 
 @router.post("/calculate/sheet/{sheet_id}", response_model=dict)
 async def recalculate_sheet_risk(
-    sheet_id: str, db: AsyncSession = Depends(get_db), auth: AuthContext = Depends(require_api_key)
+    sheet_id: str,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_api_key),
+    currency: str = Query(default="INR", description="Display currency (INR, USD, EUR, GBP, AED, SGD)"),
+    period: str = Query(default="annual", description="EAL period: annual, weekly, monthly, custom"),
+    days: int = Query(default=0, description="Days when period=custom"),
 ):
     """Recalculate risk for all assets in a sheet and update sheet rollup."""
     sheet = await db.get(Sheet, sheet_id)
@@ -114,10 +120,25 @@ async def recalculate_sheet_risk(
     await recompute_dependent_sheets(sheet.org_id, {sheet.id}, db)
     await db.commit()
 
+    # Period + currency display fields (additive — existing total_eal_inr unchanged)
+    period_eal = period_service.to_period(total_eal, period, days)
+    period_label = period_service.period_label(period, days)
+    try:
+        eal_display = currency_service.convert_and_format(total_eal, currency)
+        period_eal_display = currency_service.convert_and_format(period_eal, currency)
+    except ValueError:
+        eal_display = currency_service.convert_and_format(total_eal, "INR")
+        period_eal_display = currency_service.convert_and_format(period_eal, "INR")
+
     return {
         "sheet_id": sheet.id,
         "sheet_name": sheet.name,
         "total_eal_inr": round(total_eal, 2),
+        "total_eal_display": eal_display,
+        "period": period,
+        "period_label": period_label,
+        "period_eal_inr": round(period_eal, 2),
+        "period_eal_display": period_eal_display,
         "asset_count": len(assets),
         "rule_trace_count": len(all_traces),
     }

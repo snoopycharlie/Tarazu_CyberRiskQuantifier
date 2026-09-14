@@ -2,6 +2,11 @@
  * Types matching Tarazu CyberRiskQuant backend schemas.
  */
 
+export interface MoneyDisplay {
+  value: number;
+  formatted: string;
+}
+
 export interface Organization {
   id: string;
   name: string;
@@ -40,6 +45,7 @@ export interface RuleTraceItem {
   rule_id: string;
   description: string;
   contribution_inr: number;
+  contribution_display?: MoneyDisplay | null;
   rule_tier: string;
   reason: string;
 }
@@ -101,6 +107,7 @@ export interface BlastRadiusResult {
   reachable_asset_ids: string[];
   reachable_asset_names: string[];
   total_downstream_exposure_inr: number;
+  total_downstream_exposure_display?: MoneyDisplay | null;
   hop_count: number;
   traversal_path: Array<{
     asset_id: string;
@@ -115,7 +122,9 @@ export interface Control {
   name: string;
   status: 'present' | 'absent' | 'partial';
   cost_inr: number;
+  cost_display?: MoneyDisplay | null;
   risk_reduction_inr: number;
+  risk_reduction_display?: MoneyDisplay | null;
   roi_ratio: number;
   framework_clause_refs?: Record<string, string>;
 }
@@ -147,11 +156,19 @@ export interface OptimizeResult {
 
 export interface WhatIfResult {
   original_eal_inr: number;
+  original_eal_display?: MoneyDisplay | null;
   new_eal_inr: number;
+  new_eal_display?: MoneyDisplay | null;
   delta_inr: number;
+  delta_display?: MoneyDisplay | null;
   delta_pct: number;
   rule_trace: RuleTraceItem[];
   ai_mode: string;
+  period?: string;
+  period_eal_inr?: number | null;
+  period_eal_display?: MoneyDisplay | null;
+  period_delta_inr?: number | null;
+  period_delta_display?: MoneyDisplay | null;
 }
 
 export interface ComplianceGapItem {
@@ -201,6 +218,7 @@ export interface DashboardSummary {
   org_id: string;
   org_name: string;
   total_eal_inr: number;
+  total_eal_display?: MoneyDisplay | null;
   total_assets: number;
   critical_vulnerabilities: number;
   sheets_breakdown: Array<{
@@ -209,6 +227,7 @@ export interface DashboardSummary {
     type: string;
     asset_count: number;
     eal_inr: number;
+    eal_display?: MoneyDisplay | null;
   }>;
   top_risky_assets: Array<{
     asset_id: string;
@@ -216,14 +235,18 @@ export interface DashboardSummary {
     asset_type: string;
     criticality_tag: string;
     eal_inr: number;
+    eal_display?: MoneyDisplay | null;
     vuln_count: number;
     top_cve?: string | null;
+    top_cve_nvd_url?: string | null;
   }>;
   top_roi_controls: Array<{
     control_id: string;
     control_name: string;
     cost_inr: number;
+    cost_display?: MoneyDisplay | null;
     risk_reduction_inr: number;
+    risk_reduction_display?: MoneyDisplay | null;
     roi_ratio: number;
     status: string;
   }>;
@@ -246,4 +269,5 @@ export interface CVEMatch {
   cvss_severity?: string | null;
   description: string;
   published?: string | null;
+  nvd_url?: string | null;
 }

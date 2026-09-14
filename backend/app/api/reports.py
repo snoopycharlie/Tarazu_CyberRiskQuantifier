@@ -17,6 +17,7 @@ from ..models import Organization, Sheet, Asset, Vulnerability, Control, RiskSco
 from ..schemas import DashboardSummary
 from ..services.compliance_engine import evaluate_compliance
 from ..services.optimizer import estimate_control_risk_reduction
+from ..services import currency_service
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +26,12 @@ router = APIRouter(prefix="/api/reports", tags=["Reports & Executive Dashboard"]
 
 @router.get("/dashboard/{org_id}", response_model=DashboardSummary)
 async def get_dashboard_summary(
-    org_id: str, db: AsyncSession = Depends(get_db), auth: AuthContext = Depends(require_api_key)
+    org_id: str,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_api_key),
+    currency: str = "INR",
 ):
-    """Executive Dashboard summary with Total EAL ₹, top risky assets, quick-win fixes, and compliance stats."""
+    """Executive Dashboard summary with Total EAL, top risky assets, quick-win fixes, and compliance stats."""
     assert_org_access(auth, org_id)
     org = await db.get(Organization, org_id)
     if not org:
@@ -100,6 +104,11 @@ async def get_dashboard_summary(
             "eal_inr": round(eal, 2),
             "vuln_count": len(a.vulnerabilities),
             "top_cve": a.vulnerabilities[0].cve_id if a.vulnerabilities else None,
+            "top_cve_nvd_url": (
+                f"https://nvd.nist.gov/vuln/detail/{a.vulnerabilities[0].cve_id}"
+                if a.vulnerabilities and a.vulnerabilities[0].cve_id
+                else None
+            ),
         })
     scored_assets.sort(key=lambda x: x["eal_inr"], reverse=True)
     top_assets = scored_assets[:5]
@@ -227,18 +236,33 @@ async def get_dashboard_summary(
         {"label": "Current Posture", "timestamp": "2026-03-01", "eal_inr": round(total_eal, 2), "risk_score": org_risk_score},
     ]
 
+    # Build display helpers (safe fallback to INR on bad currency param)
+    def _disp(val: float) -> dict:
+        try:
+            return currency_service.convert_and_format(val, currency)
+        except ValueError:
+            return currency_service.convert_and_format(val, "INR")
+
     return DashboardSummary(
         org_id=org.id,
         org_name=org.name,
         total_eal_inr=round(total_eal, 2),
+        total_eal_display=_disp(total_eal),
         total_assets=total_assets,
         critical_vulnerabilities=critical_vulns_count,
-        sheets_breakdown=sheets_breakdown,
-        top_risky_assets=top_assets,
-        top_roi_controls=top_roi_controls,
+        sheets_breakdown=[
+            {**s, "eal_display": _disp(s["eal_inr"])} for s in sheets_breakdown
+        ],
+        top_risky_assets=[
+            {**a, "eal_display": _disp(a["eal_inr"])} for a in top_assets
+        ],
+        top_roi_controls=[
+            {**c, "cost_display": _disp(c["cost_inr"]), "risk_reduction_display": _disp(c["risk_reduction_inr"])}
+            for c in top_roi_controls
+        ],
         compliance_overview=compliance_overview,
-        compliance_iso27001=iso_info,
-        compliance_rbi_csf=rbi_info,
+        compliance_iso27001=iso_info or {"satisfied": 0, "total": 0, "coverage_pct": 0.0},
+        compliance_rbi_csf=rbi_info or {"satisfied": 0, "total": 0, "coverage_pct": 0.0},
         category_breakdown=category_breakdown,
         incident_cost_breakdown=incident_cost_breakdown,
         peer_benchmark=peer_benchmark,

@@ -18,7 +18,16 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
   const [loadingControls, setLoadingControls] = useState(false);
   const [loadingWhatIf, setLoadingWhatIf] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [period, setPeriod] = useState<'annual' | 'weekly' | 'monthly' | 'custom'>('annual');
+  const [customDays, setCustomDays] = useState(30);
   const { t } = useLanguage();
+
+  const PERIOD_LABELS: Record<string, string> = {
+    annual: 'Annual',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    custom: `${customDays}-Day`,
+  };
 
   useEffect(() => {
     if (currentOrg) {
@@ -52,7 +61,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
 
     try {
       setLoadingWhatIf(true);
-      const res = await api.whatIfSimulation(currentOrg.id, updated);
+      const res = await api.whatIfSimulation(currentOrg.id, updated, undefined, 'INR', period, period === 'custom' ? customDays : 0);
       setWhatIfResult(res);
     } catch (err) {
       console.error('What-If simulation failed:', err);
@@ -173,6 +182,40 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
         </AnimatePresence>
       </motion.div>
 
+      {/* Period Selector */}
+      <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3">
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+          EAL Period
+        </span>
+        {(['annual', 'weekly', 'monthly', 'custom'] as const).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPeriod(p)}
+            className="px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all"
+            style={period === p
+              ? { background: 'var(--accent-primary)', borderColor: 'var(--accent-primary)', color: '#ffffff' }
+              : { background: 'var(--bg-surface)', borderColor: 'var(--border-strong)', color: 'var(--text-secondary)' }
+            }
+          >
+            {p.charAt(0).toUpperCase() + p.slice(1)}
+          </button>
+        ))}
+        {period === 'custom' && (
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min={1}
+              max={365}
+              value={customDays}
+              onChange={(e) => setCustomDays(Math.max(1, Math.min(365, Number(e.target.value))))}
+              className="cyber-input w-20 text-xs py-1.5"
+              placeholder="Days"
+            />
+            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>days</span>
+          </div>
+        )}
+      </motion.div>
+
       {/* Results Banner — visible when changes are made */}
       <AnimatePresence>
         {whatIfResult && (
@@ -195,20 +238,20 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
                 </span>
                 <h2 className="text-3xl font-bold mt-1" style={{ color: whatIfResult.delta_inr >= 0 ? 'var(--risk-low)' : 'var(--risk-critical)' }}>
                   {whatIfResult.delta_inr >= 0
-                    ? `${t('whatif.save')} ${formatInr(whatIfResult.delta_inr)}`
-                    : `${t('whatif.moreExposure')} ${formatInr(Math.abs(whatIfResult.delta_inr))}`}
+                    ? `${t('whatif.save')} ${whatIfResult.delta_display?.formatted ?? formatInr(whatIfResult.delta_inr)}`
+                    : `${t('whatif.moreExposure')} ${whatIfResult.delta_display?.formatted ?? formatInr(Math.abs(whatIfResult.delta_inr))}`}
                 </h2>
                 <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                   {whatIfResult.delta_inr >= 0
-                    ? `Your estimated annual exposure reduces by ${whatIfResult.delta_pct.toFixed(1)}%`
-                    : `Your estimated annual exposure increases by ${Math.abs(whatIfResult.delta_pct).toFixed(1)}%`}
+                    ? `Your estimated ${whatIfResult.period ?? PERIOD_LABELS[period]} exposure reduces by ${whatIfResult.delta_pct.toFixed(1)}%`
+                    : `Your estimated ${whatIfResult.period ?? PERIOD_LABELS[period]} exposure increases by ${Math.abs(whatIfResult.delta_pct).toFixed(1)}%`}
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-[11px] uppercase font-bold block" style={{ color: 'var(--text-muted)' }}>{t('whatif.before')}</div>
                   <div className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                    {formatInr(whatIfResult.original_eal_inr)}
+                    {whatIfResult.original_eal_display?.formatted ?? formatInr(whatIfResult.original_eal_inr)}
                   </div>
                   <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{t('whatif.currentExposure')}</div>
                 </div>
@@ -218,7 +261,7 @@ export const WhatIfView: React.FC<WhatIfViewProps> = ({ currentOrg }) => {
                 <div>
                   <div className="text-[11px] uppercase font-bold block" style={{ color: 'var(--text-muted)' }}>{t('whatif.after')}</div>
                   <div className="text-xl font-bold" style={{ color: whatIfResult.delta_inr >= 0 ? 'var(--risk-low)' : 'var(--risk-critical)' }}>
-                    {formatInr(whatIfResult.new_eal_inr)}
+                    {whatIfResult.new_eal_display?.formatted ?? formatInr(whatIfResult.new_eal_inr)}
                   </div>
                   <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{t('whatif.withChanges')}</div>
                 </div>
@@ -340,7 +383,7 @@ const ControlToggleCard: React.FC<ControlToggleCardProps> = ({
           </h4>
           {ctrl.cost_inr > 0 && (
             <span className="text-[11px] block mt-0.5" style={{ color: 'var(--text-muted)' }}>
-              Implementation cost: {formatInr(ctrl.cost_inr)}
+              Implementation cost: {ctrl.cost_display?.formatted ?? formatInr(ctrl.cost_inr)}
             </span>
           )}
         </div>
@@ -368,12 +411,12 @@ const ControlToggleCard: React.FC<ControlToggleCardProps> = ({
           {isPresent ? (
             <>
               <TrendingDown className="w-3 h-3" />
-              <span>Reduces exposure by {formatInr(ctrl.risk_reduction_inr)}</span>
+              <span>Reduces exposure by {ctrl.risk_reduction_display?.formatted ?? formatInr(ctrl.risk_reduction_inr)}</span>
             </>
           ) : (
             <>
               <TrendingUp className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
-              <span style={{ color: 'var(--text-secondary)' }}>Could reduce {formatInr(ctrl.risk_reduction_inr)}</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Could reduce {ctrl.risk_reduction_display?.formatted ?? formatInr(ctrl.risk_reduction_inr)}</span>
             </>
           )}
         </div>

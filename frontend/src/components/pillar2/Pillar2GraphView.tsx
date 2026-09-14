@@ -450,9 +450,15 @@ export const Pillar2GraphView: React.FC<Pillar2GraphViewProps> = ({
                     <div className="section-label mb-2">{t('spread.panel.weaknesses')}</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedNode.cves.map((cve: string) => (
-                        <span key={cve} className="risk-badge-critical text-[10px] px-2 py-1">
+                        <a 
+                          key={cve} 
+                          href={`https://nvd.nist.gov/vuln/detail/${cve}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="risk-badge-critical text-[10px] px-2 py-1 hover:underline"
+                        >
                           {cve}
-                        </span>
+                        </a>
                       ))}
                     </div>
                   </div>

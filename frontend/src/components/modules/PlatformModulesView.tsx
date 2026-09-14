@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { containerVariants, itemVariants } from '../../animations';
+import { containerVariants, itemVariants, slideUpVariants } from '../../utils/animations';
 import {
   FileUp,
   MessageSquareCode,
@@ -524,7 +524,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
             <span>CyberRisk RAG Advisory Assistant</span>
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* ══════════════════════════════════════════════════════════════════════
           MODULE 1: AUTOMATED DOCUMENT INGESTION & POLICY PARSING
@@ -824,7 +824,7 @@ export const PlatformModulesView: React.FC<PlatformModulesViewProps> = ({
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════

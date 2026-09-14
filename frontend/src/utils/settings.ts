@@ -7,7 +7,8 @@ export interface AppSettings {
   theme: ThemeMode;
   density: DensityMode;
   defaultPage: string;
-  defaultCurrency: 'INR';
+  defaultCurrency: string;  // kept for backward compatibility
+  currency: string;         // active display currency: INR | USD | EUR | GBP | AED | SGD
   riskAlerts: boolean;
   complianceAlerts: boolean;
   recommendationAlerts: boolean;
@@ -19,6 +20,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   density: 'comfortable',
   defaultPage: 'dashboard',
   defaultCurrency: 'INR',
+  currency: 'INR',
   riskAlerts: true,
   complianceAlerts: true,
   recommendationAlerts: true,

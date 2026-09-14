@@ -22,6 +22,7 @@ from ..services.rules_engine import (
     OrgContext, AssetContext, VulnContext, ControlsContext,
     compute_asset_risk
 )
+from ..services import currency_service, period_service
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,10 @@ router = APIRouter(prefix="/api/optimization", tags=["Optimization & What-If"])
 
 @router.get("/controls", response_model=list[dict])
 async def list_controls(
-    org_id: str = Query(...), db: AsyncSession = Depends(get_db), auth: AuthContext = Depends(require_api_key)
+    org_id: str = Query(...),
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_api_key),
+    currency: str = Query(default="INR", description="Display currency (INR, USD, EUR, GBP, AED, SGD)"),
 ):
     """List all organizational controls with status, cost, estimated risk reduction, and ROI."""
     assert_org_access(auth, org_id)
@@ -57,6 +61,12 @@ async def list_controls(
         risk_red = estimate_control_risk_reduction(c.name, org.annual_revenue_inr, total_eal)
         cost = max(c.cost_inr, 1.0)
         roi = risk_red / cost
+        try:
+            cost_display = currency_service.convert_and_format(c.cost_inr, currency)
+            risk_red_display = currency_service.convert_and_format(risk_red, currency)
+        except ValueError:
+            cost_display = currency_service.convert_and_format(c.cost_inr, "INR")
+            risk_red_display = currency_service.convert_and_format(risk_red, "INR")
 
         output.append({
             "id": c.id,
@@ -64,7 +74,9 @@ async def list_controls(
             "name": c.name,
             "status": c.status,
             "cost_inr": c.cost_inr,
+            "cost_display": cost_display,
             "risk_reduction_inr": round(risk_red, 2),
+            "risk_reduction_display": risk_red_display,
             "roi_ratio": round(roi, 2),
             "framework_clause_refs": c.framework_clause_refs or {},
         })
@@ -181,7 +193,12 @@ async def optimize_controls(
 
 @router.post("/what-if", response_model=WhatIfResult)
 async def what_if_simulation(
-    payload: WhatIfRequest, db: AsyncSession = Depends(get_db), auth: AuthContext = Depends(require_api_key)
+    payload: WhatIfRequest,
+    db: AsyncSession = Depends(get_db),
+    auth: AuthContext = Depends(require_api_key),
+    currency: str = Query(default="INR", description="Display currency (INR, USD, EUR, GBP, AED, SGD)"),
+    period: str = Query(default="annual", description="EAL period: annual, weekly, monthly, custom"),
+    days: int = Query(default=0, description="Days when period=custom"),
 ):
     """
     Live What-If Simulation endpoint.
@@ -274,11 +291,39 @@ async def what_if_simulation(
             seen_rules.add(t["rule_id"])
             dedup_traces.append(t)
 
+    # Currency + period display fields (additive)
+    try:
+        orig_display = currency_service.convert_and_format(original_eal, currency)
+        new_display = currency_service.convert_and_format(new_eal, currency)
+        delta_display = currency_service.convert_and_format(delta_inr, currency)
+    except ValueError:
+        orig_display = currency_service.convert_and_format(original_eal, "INR")
+        new_display = currency_service.convert_and_format(new_eal, "INR")
+        delta_display = currency_service.convert_and_format(delta_inr, "INR")
+
+    period_eal = period_service.to_period(original_eal, period, days)
+    period_delta = period_service.to_period(delta_inr, period, days)
+    period_lbl = period_service.period_label(period, days)
+    try:
+        period_eal_display = currency_service.convert_and_format(period_eal, currency)
+        period_delta_display = currency_service.convert_and_format(period_delta, currency)
+    except ValueError:
+        period_eal_display = currency_service.convert_and_format(period_eal, "INR")
+        period_delta_display = currency_service.convert_and_format(period_delta, "INR")
+
     return WhatIfResult(
         original_eal_inr=round(original_eal, 2),
+        original_eal_display=orig_display,
         new_eal_inr=round(new_eal, 2),
+        new_eal_display=new_display,
         delta_inr=delta_inr,
+        delta_display=delta_display,
         delta_pct=delta_pct,
         rule_trace=dedup_traces[:10],
         ai_mode="rules_only",
+        period=period_lbl,
+        period_eal_inr=round(period_eal, 2),
+        period_eal_display=period_eal_display,
+        period_delta_inr=round(period_delta, 2),
+        period_delta_display=period_delta_display,
     )

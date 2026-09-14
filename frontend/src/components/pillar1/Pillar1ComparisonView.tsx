@@ -72,7 +72,15 @@ export const Pillar1ComparisonView: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-sm font-bold" style={{ color: 'var(--risk-critical)' }}>CVE-2023-4966</span>
+                <a
+                  href="https://nvd.nist.gov/vuln/detail/CVE-2023-4966"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-sm font-bold hover:underline"
+                  style={{ color: 'var(--risk-critical)' }}
+                >
+                  CVE-2023-4966
+                </a>
                 <span className="risk-badge-critical text-[10px]">
                   Severity 9.4 / 10
                 </span>

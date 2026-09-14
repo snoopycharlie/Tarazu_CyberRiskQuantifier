@@ -4,7 +4,15 @@ app/schemas.py — Pydantic v2 schemas for request/response validation.
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, Any
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
+
+
+# ── Money Display ──────────────────────────────────────────────────────────────
+
+class MoneyDisplay(BaseModel):
+    """Pre-formatted currency display returned by currency_service.convert_and_format()."""
+    value: float          # converted numeric amount
+    formatted: str        # ready-to-render string, e.g. "$1,234.56" or "₹12.34 Lakh"
 
 
 # ── Organization ──────────────────────────────────────────────────────────────
@@ -101,6 +109,7 @@ class RuleTraceEntry(BaseModel):
     contribution_inr: float
     rule_tier: str  # "universal" | "sector"
     reason: str
+    contribution_display: Optional[MoneyDisplay] = None
 
 
 # ── Risk Score ────────────────────────────────────────────────────────────────
@@ -111,6 +120,7 @@ class RiskScoreOut(BaseModel):
     sheet_id: Optional[str]
     asset_id: Optional[str]
     expected_annual_loss_inr: float
+    expected_annual_loss_display: Optional[MoneyDisplay] = None
     computed_at: datetime
     rule_trace: Optional[list[dict]]
     ai_narrative: Optional[str]
@@ -141,6 +151,7 @@ class BlastRadiusResult(BaseModel):
     reachable_asset_ids: list[str]
     reachable_asset_names: list[str]
     total_downstream_exposure_inr: float
+    total_downstream_exposure_display: Optional[MoneyDisplay] = None
     hop_count: int
     traversal_path: list[dict]  # [{asset_id, asset_name, strength}]
 
@@ -154,7 +165,9 @@ class RecommendationOut(BaseModel):
     control_id: str
     control_name: str
     risk_reduction_inr: float
+    risk_reduction_display: Optional[MoneyDisplay] = None
     cost_inr: float
+    cost_display: Optional[MoneyDisplay] = None
     roi_ratio: float
     ai_rationale: Optional[str]
 
@@ -169,7 +182,9 @@ class OptimizeRequest(BaseModel):
 
 class ROSIPoint(BaseModel):
     cumulative_investment_inr: float
+    cumulative_investment_display: Optional[MoneyDisplay] = None
     cumulative_risk_reduction_inr: float
+    cumulative_risk_reduction_display: Optional[MoneyDisplay] = None
     control_name: str
     roi_ratio: float
 
@@ -177,7 +192,9 @@ class ROSIPoint(BaseModel):
 class OptimizeResult(BaseModel):
     selected_controls: list[RecommendationOut]
     total_cost_inr: float
+    total_cost_display: Optional[MoneyDisplay] = None
     total_risk_reduction_inr: float
+    total_risk_reduction_display: Optional[MoneyDisplay] = None
     rosi_curve: list[ROSIPoint]
     ai_rationale: Optional[str]
     ai_mode: str
@@ -216,6 +233,13 @@ class CVEMatch(BaseModel):
     cvss_severity: Optional[str]
     description: str
     published: Optional[str]
+    nvd_url: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _populate_nvd_url(self) -> "CVEMatch":
+        if self.cve_id and not self.nvd_url:
+            self.nvd_url = f"https://nvd.nist.gov/vuln/detail/{self.cve_id}"
+        return self
 
 
 # ── Combined Sheet Correlation ─────────────────────────────────────────────────
@@ -284,6 +308,7 @@ class DashboardSummary(BaseModel):
     org_id: str
     org_name: str
     total_eal_inr: float
+    total_eal_display: Optional[MoneyDisplay] = None
     total_assets: int
     critical_vulnerabilities: int
     sheets_breakdown: list[dict]
@@ -309,11 +334,20 @@ class WhatIfRequest(BaseModel):
 
 class WhatIfResult(BaseModel):
     original_eal_inr: float
+    original_eal_display: Optional[MoneyDisplay] = None
     new_eal_inr: float
+    new_eal_display: Optional[MoneyDisplay] = None
     delta_inr: float
+    delta_display: Optional[MoneyDisplay] = None
     delta_pct: float
     rule_trace: list[dict]
     ai_mode: str
+    # Period-adjusted fields (populated when period != "annual")
+    period: str = "annual"
+    period_eal_inr: Optional[float] = None
+    period_eal_display: Optional[MoneyDisplay] = None
+    period_delta_inr: Optional[float] = None
+    period_delta_display: Optional[MoneyDisplay] = None
 
 
 # ── Demo Comparison ───────────────────────────────────────────────────────────

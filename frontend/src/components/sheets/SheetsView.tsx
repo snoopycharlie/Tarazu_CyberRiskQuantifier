@@ -330,22 +330,38 @@ export const SheetsView: React.FC<SheetsViewProps> = ({
                           <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'rgba(56, 189, 248, 0.1)', color: 'var(--risk-low)' }}>No open vulnerabilities</span>
                         ) : (
                           <div className="flex flex-wrap gap-1.5">
-                            {asset.vulnerabilities.map((v) => (
-                              <span
-                                key={v.id}
-                                title={v.description}
-                                className="font-mono text-xs font-bold px-2 py-1 rounded"
-                                style={
-                                  (v.cvss_score || 0) >= 9.0
-                                    ? { background: 'rgba(244, 63, 94, 0.1)', color: 'var(--risk-critical)' }
-                                    : (v.cvss_score || 0) >= 7.0
-                                    ? { background: 'rgba(249, 115, 22, 0.1)', color: 'var(--risk-high)' }
-                                    : { background: 'var(--bg-surface-hover)', color: 'var(--text-secondary)' }
-                                }
-                              >
-                                {v.cve_id || 'Vuln'} {v.cvss_score ? `(${v.cvss_score})` : ''}
-                              </span>
-                            ))}
+                            {asset.vulnerabilities.map((v) => {
+                              const nvdUrl = v.cve_id ? `https://nvd.nist.gov/vuln/detail/${v.cve_id}` : null;
+                              const badgeStyle =
+                                (v.cvss_score || 0) >= 9.0
+                                  ? { background: 'rgba(244, 63, 94, 0.1)', color: 'var(--risk-critical)' }
+                                  : (v.cvss_score || 0) >= 7.0
+                                  ? { background: 'rgba(249, 115, 22, 0.1)', color: 'var(--risk-high)' }
+                                  : { background: 'var(--bg-surface-hover)', color: 'var(--text-secondary)' };
+                              const label = `${v.cve_id || 'Vuln'} ${v.cvss_score ? `(${v.cvss_score})` : ''}`;
+                              return nvdUrl ? (
+                                <a
+                                  key={v.id}
+                                  href={nvdUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title={v.description}
+                                  className="font-mono text-xs font-bold px-2 py-1 rounded hover:underline"
+                                  style={badgeStyle}
+                                >
+                                  {label}
+                                </a>
+                              ) : (
+                                <span
+                                  key={v.id}
+                                  title={v.description}
+                                  className="font-mono text-xs font-bold px-2 py-1 rounded"
+                                  style={badgeStyle}
+                                >
+                                  {label}
+                                </span>
+                              );
+                            })}
                           </div>
                         )}
                       </td>

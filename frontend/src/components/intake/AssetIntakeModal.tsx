@@ -232,7 +232,20 @@ export const AssetIntakeModal: React.FC<AssetIntakeModalProps> = ({
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-xs text-ink">{m.cve_id}</span>
+                        {m.nvd_url ? (
+                          <a
+                            href={m.nvd_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            title="View on NVD"
+                            className="font-mono font-bold text-xs text-ink hover:underline"
+                          >
+                            {m.cve_id}
+                          </a>
+                        ) : (
+                          <span className="font-mono font-bold text-xs text-ink">{m.cve_id}</span>
+                        )}
                         {m.cvss_score && (
                           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                             m.cvss_score >= 9.0 ? 'bg-crimson/15 text-crimson' : 'bg-amber/15 text-amber'

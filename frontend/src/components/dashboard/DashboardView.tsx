@@ -111,7 +111,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </button>
             </div>
             <div className="metric-value mt-3" style={{ color: 'var(--risk-critical)' }}>
-              {formatInr(summary.total_eal_inr)}
+              {summary.total_eal_display?.formatted ?? formatInr(summary.total_eal_inr)}
             </div>
             <span className="text-[11px] font-semibold mt-1 block" style={{ color: 'var(--risk-critical)', opacity: 0.85 }}>{t('dash.kpi.exposureTag')}</span>
           </div>
@@ -235,7 +235,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div className="mt-4 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{t('dash.segment.estimatedExposure')}</span>
-                    <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{formatInr(s.eal_inr)}</span>
+                    <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{s.eal_display?.formatted ?? formatInr(s.eal_inr)}</span>
                   </div>
                   <div className="progress-track">
                     <div
@@ -279,15 +279,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{asset.asset_type}</span>
                       {asset.top_cve && (
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold" style={{ background: 'var(--bg-page)', color: 'var(--text-muted)' }} title="Common Vulnerabilities and Exposures (CVE) identifier">
-                          {asset.top_cve}
-                        </span>
+                        asset.top_cve_nvd_url ? (
+                          <a
+                            href={asset.top_cve_nvd_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold hover:underline"
+                            style={{ background: 'var(--bg-page)', color: 'var(--text-muted)' }}
+                            title="View on NVD"
+                          >
+                            {asset.top_cve}
+                          </a>
+                        ) : (
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold" style={{ background: 'var(--bg-page)', color: 'var(--text-muted)' }} title="Common Vulnerabilities and Exposures (CVE) identifier">
+                            {asset.top_cve}
+                          </span>
+                        )
                       )}
                     </div>
                   </div>
                 </div>
                 <div className="text-right whitespace-nowrap">
-                  <span className="text-sm font-bold block" style={{ color: 'var(--risk-critical)' }}>{formatInr(asset.eal_inr)}</span>
+                  <span className="text-sm font-bold block" style={{ color: 'var(--risk-critical)' }}>{asset.eal_display?.formatted ?? formatInr(asset.eal_inr)}</span>
                   <span className="text-[11px] mt-0.5 block" style={{ color: 'var(--text-secondary)' }}>{asset.vuln_count} {asset.vuln_count === 1 ? t('dash.asset.weakness') : t('dash.asset.weaknesses')}</span>
                 </div>
               </div>
@@ -320,7 +333,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </span>
                   <div className="min-w-0">
                     <h4 className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{ctrl.control_name}</h4>
-                    <span className="text-xs mt-0.5 block" style={{ color: 'var(--text-secondary)' }}>{t('dash.invest.cost')} {formatInr(ctrl.cost_inr)}</span>
+                    <span className="text-xs mt-0.5 block" style={{ color: 'var(--text-secondary)' }}>{t('dash.invest.cost')} {ctrl.cost_display?.formatted ?? formatInr(ctrl.cost_inr)}</span>
                   </div>
                 </div>
                 <div className="text-right whitespace-nowrap">
@@ -328,7 +341,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     {ctrl.roi_ratio.toFixed(1)}x {t('dash.invest.return')}
                   </span>
                   <span className="text-[11px] font-semibold mt-1 block" style={{ color: 'var(--text-muted)' }}>
-                    {t('dash.invest.saves')} {formatInr(ctrl.risk_reduction_inr)}
+                    {t('dash.invest.saves')} {ctrl.risk_reduction_display?.formatted ?? formatInr(ctrl.risk_reduction_inr)}
                   </span>
                 </div>
               </div>

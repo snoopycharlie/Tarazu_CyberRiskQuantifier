@@ -210,9 +210,9 @@ export const api = {
   },
 
   // Optimization & Live What-If
-  listControls: async (orgId: string): Promise<Control[]> => {
+  listControls: async (orgId: string, currency = 'INR'): Promise<Control[]> => {
     try {
-      const res = await request<Control[]>(`/optimization/controls?org_id=${orgId}`);
+      const res = await request<Control[]>(`/optimization/controls?org_id=${orgId}&currency=${currency}`);
       if (Array.isArray(res) && res.length > 0) return res;
       return DEMO_CONTROLS;
     } catch {
@@ -233,9 +233,17 @@ export const api = {
       return DEMO_OPTIMIZE_RESULT;
     }
   },
-  whatIfSimulation: async (orgId: string, toggledControls: Record<string, string>, sheetId?: string): Promise<WhatIfResult> => {
+  whatIfSimulation: async (
+    orgId: string,
+    toggledControls: Record<string, string>,
+    sheetId?: string,
+    currency = 'INR',
+    period = 'annual',
+    days = 0,
+  ): Promise<WhatIfResult> => {
     try {
-      return await request<WhatIfResult>('/optimization/what-if', {
+      const params = new URLSearchParams({ currency, period, days: String(days) });
+      return await request<WhatIfResult>(`/optimization/what-if?${params}`, {
         method: 'POST',
         body: JSON.stringify({
           org_id: orgId,
@@ -270,9 +278,9 @@ export const api = {
   },
 
   // Reports & Dashboard
-  getDashboard: async (orgId: string): Promise<DashboardSummary> => {
+  getDashboard: async (orgId: string, currency = 'INR'): Promise<DashboardSummary> => {
     try {
-      return await request<DashboardSummary>(`/reports/dashboard/${orgId}`);
+      return await request<DashboardSummary>(`/reports/dashboard/${orgId}?currency=${currency}`);
     } catch {
       return DEMO_DASHBOARD;
     }

@@ -76,6 +76,7 @@ def _parse_cve(cve_item: dict) -> dict:
         "cvss_severity": cvss_severity,
         "description": desc[:500] if desc else "",
         "published": published,
+        "nvd_url": f"https://nvd.nist.gov/vuln/detail/{cve_id}" if cve_id else None,
     }
 
 
